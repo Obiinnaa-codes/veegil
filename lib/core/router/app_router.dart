@@ -12,6 +12,7 @@ import '../../features/dashboard/presentation/screens/placeholders/deposit_place
 import '../../features/dashboard/presentation/screens/placeholders/transfer_placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/placeholders/withdraw_placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/tab_placeholder_screens.dart';
+import '../../features/transactions/presentation/screens/transactions_screen.dart';
 import '../../features/dashboard/presentation/widgets/dashboard_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -103,7 +104,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: RoutePaths.transactions,
             pageBuilder: (context, state) => _fadePage(
               state: state,
-              child: const TransactionsPlaceholderScreen(),
+              child: const TransactionsScreen(),
             ),
           ),
           GoRoute(

@@ -1,0 +1,36 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/theme/app_colors.dart';
+import '../../domain/entities/transaction_category.dart';
+
+abstract final class TransactionColors {
+  static Color forCategory(TransactionCategory category) {
+    switch (category) {
+      case TransactionCategory.deposit:
+        return AppColors.success;
+      case TransactionCategory.withdraw:
+        return AppColors.transactionWithdraw;
+      case TransactionCategory.transfer:
+        return AppColors.transactionTransfer;
+      case TransactionCategory.unknown:
+        return AppColors.subtitle;
+    }
+  }
+
+  static String labelForCategory(TransactionCategory category, {String? note}) {
+    if (note != null && note.isNotEmpty) {
+      return note[0].toUpperCase() + note.substring(1);
+    }
+
+    switch (category) {
+      case TransactionCategory.deposit:
+        return 'Deposit';
+      case TransactionCategory.withdraw:
+        return 'Withdraw';
+      case TransactionCategory.transfer:
+        return 'Transfer';
+      case TransactionCategory.unknown:
+        return 'Transaction';
+    }
+  }
+}

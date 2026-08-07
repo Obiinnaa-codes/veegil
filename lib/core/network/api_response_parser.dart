@@ -34,3 +34,50 @@ Map<String, dynamic> parseApiEnvelope(Response<dynamic> response) {
 
   return data;
 }
+
+class ApiListPayload {
+  const ApiListPayload({
+    required this.items,
+    this.meta,
+  });
+
+  final List<Map<String, dynamic>> items;
+  final Map<String, dynamic>? meta;
+}
+
+ApiListPayload parseApiListEnvelope(Response<dynamic> response) {
+  final data = response.data;
+  if (data is! Map<String, dynamic>) {
+    throw const ApiException(
+      userMessage: 'Received an invalid response from the server.',
+    );
+  }
+
+  final status = data['status'];
+  if (status == 'error') {
+    final message = data['message'];
+    throw ApiException(
+      userMessage: message is String && message.isNotEmpty
+          ? message
+          : 'Something went wrong. Please try again.',
+      statusCode: response.statusCode,
+    );
+  }
+
+  final payload = data['data'];
+  if (payload is! List) {
+    throw const ApiException(
+      userMessage: 'Received an invalid response from the server.',
+    );
+  }
+
+  final items = payload
+      .whereType<Map<String, dynamic>>()
+      .toList(growable: false);
+
+  final meta = data['meta'];
+  return ApiListPayload(
+    items: items,
+    meta: meta is Map<String, dynamic> ? meta : null,
+  );
+}

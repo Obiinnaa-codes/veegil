@@ -1,0 +1,244 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_exception.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/responsive.dart';
+import '../../../dashboard/presentation/widgets/dashboard_error_view.dart';
+import '../controllers/transactions_controller.dart';
+import '../controllers/transactions_state.dart';
+import '../widgets/transaction_filter_chips.dart';
+import '../widgets/transaction_item.dart';
+import '../widgets/transactions_empty_state.dart';
+import '../widgets/transactions_shimmer.dart';
+
+class TransactionsScreen extends ConsumerStatefulWidget {
+  const TransactionsScreen({super.key});
+
+  @override
+  ConsumerState<TransactionsScreen> createState() => _TransactionsScreenState();
+}
+
+class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
+  final _searchController = TextEditingController();
+  final _scrollController = ScrollController();
+  Timer? _searchDebounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _searchDebounce?.cancel();
+    _searchController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+
+    final position = _scrollController.position;
+    if (position.pixels >= position.maxScrollExtent - 200) {
+      ref.read(transactionsControllerProvider.notifier).loadMore();
+    }
+  }
+
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
+      ref.read(transactionsControllerProvider.notifier).setSearchQuery(value);
+    });
+  }
+
+  String _mapError(Object error) {
+    if (error is DioException) {
+      return error.apiException.userMessage;
+    }
+    if (error is ApiException) {
+      return error.userMessage;
+    }
+    return 'Something went wrong. Please try again.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final transactionsState = ref.watch(transactionsControllerProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Transactions'),
+      ),
+      body: SafeArea(
+        child: transactionsState.when(
+          loading: () => _TransactionsScrollContent(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SearchField(
+                  controller: _searchController,
+                  enabled: false,
+                  onChanged: _onSearchChanged,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                const TransactionsShimmer(),
+              ],
+            ),
+          ),
+          error: (error, _) => DashboardErrorView(
+            message: _mapError(error),
+            onRetry: () =>
+                ref.read(transactionsControllerProvider.notifier).refresh(),
+          ),
+          data: (state) => RefreshIndicator(
+            onRefresh: () =>
+                ref.read(transactionsControllerProvider.notifier).refresh(),
+            child: _TransactionsScrollContent(
+              controller: _scrollController,
+              child: _TransactionsBody(
+                state: state,
+                searchController: _searchController,
+                onSearchChanged: _onSearchChanged,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TransactionsBody extends ConsumerWidget {
+  const _TransactionsBody({
+    required this.state,
+    required this.searchController,
+    required this.onSearchChanged,
+  });
+
+  final TransactionsState state;
+  final TextEditingController searchController;
+  final ValueChanged<String> onSearchChanged;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filtered = state.filteredTransactions;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _SearchField(
+          controller: searchController,
+          onChanged: onSearchChanged,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        TransactionFilterChips(
+          activeFilter: state.activeFilter,
+          onFilterChanged:
+              ref.read(transactionsControllerProvider.notifier).setFilter,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        if (filtered.isEmpty)
+          const TransactionsEmptyState()
+        else
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: filtered.length,
+            separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
+            itemBuilder: (context, index) {
+              return TransactionItem(transaction: filtered[index]);
+            },
+          ),
+        if (state.isLoadingMore) ...[
+          const SizedBox(height: AppSpacing.lg),
+          const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        ],
+        const SizedBox(height: AppSpacing.lg),
+      ],
+    );
+  }
+}
+
+class _SearchField extends StatelessWidget {
+  const _SearchField({
+    required this.controller,
+    required this.onChanged,
+    this.enabled = true,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+  final bool enabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      enabled: enabled,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: 'Search transactions',
+        prefixIcon: const Icon(Icons.search, color: AppColors.subtitle),
+        filled: true,
+        fillColor: AppColors.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+      ),
+    );
+  }
+}
+
+class _TransactionsScrollContent extends StatelessWidget {
+  const _TransactionsScrollContent({
+    required this.child,
+    this.controller,
+  });
+
+  final Widget child;
+  final ScrollController? controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          controller: controller,
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.dashboardHorizontalPadding(),
+            vertical: AppSpacing.md,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: Responsive.dashboardMaxContentWidth(context),
+                minHeight: constraints.maxHeight - AppSpacing.md * 2,
+              ),
+              child: child,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
