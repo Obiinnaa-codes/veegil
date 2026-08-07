@@ -2,6 +2,7 @@ abstract final class AppConstants {
   static const Duration mockNetworkDelay = Duration(milliseconds: 800);
 
   static const double authCardMaxWidth = 420;
+  static const double dashboardContentMaxWidth = 480;
   static const double minTouchTarget = 48;
   static const double buttonHeight = 58;
   static const double textFieldHeight = 60;

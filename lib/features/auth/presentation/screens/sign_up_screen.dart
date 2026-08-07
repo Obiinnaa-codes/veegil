@@ -36,7 +36,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final success =
         await ref.read(signUpControllerProvider.notifier).submit();
     if (success && mounted) {
-      context.go(RoutePaths.home);
+      context.go(RoutePaths.dashboard);
     }
   }
 

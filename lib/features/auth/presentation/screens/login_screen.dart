@@ -34,7 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleLogin() async {
     final success = await ref.read(loginControllerProvider.notifier).submit();
     if (success && mounted) {
-      context.go(RoutePaths.home);
+      context.go(RoutePaths.dashboard);
     }
   }
 

@@ -7,9 +7,24 @@ import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/home/presentation/screens/home_screen.dart';
+import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../features/dashboard/presentation/screens/placeholders/deposit_placeholder_screen.dart';
+import '../../features/dashboard/presentation/screens/placeholders/transfer_placeholder_screen.dart';
+import '../../features/dashboard/presentation/screens/placeholders/withdraw_placeholder_screen.dart';
+import '../../features/dashboard/presentation/screens/tab_placeholder_screens.dart';
+import '../../features/dashboard/presentation/widgets/dashboard_shell.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
+final _shellNavigatorKey = GlobalKey<NavigatorState>();
+
+bool _isAuthenticatedRoute(String location) {
+  return location == RoutePaths.dashboard ||
+      location == RoutePaths.transactions ||
+      location == RoutePaths.profile ||
+      location == RoutePaths.deposit ||
+      location == RoutePaths.withdraw ||
+      location == RoutePaths.transfer;
+}
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _RouterRefreshNotifier();
@@ -39,12 +54,12 @@ final routerProvider = Provider<GoRouter>((ref) {
         if (location == RoutePaths.login ||
             location == RoutePaths.signUp ||
             location == RoutePaths.splash) {
-          return RoutePaths.home;
+          return RoutePaths.dashboard;
         }
       }
 
       if (!isLoading && !isAuthenticated) {
-        if (location == RoutePaths.home || location == RoutePaths.splash) {
+        if (_isAuthenticatedRoute(location) || location == RoutePaths.splash) {
           return RoutePaths.login;
         }
       }
@@ -73,11 +88,55 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const SignUpScreen(),
         ),
       ),
+      ShellRoute(
+        navigatorKey: _shellNavigatorKey,
+        builder: (context, state, child) => DashboardShell(child: child),
+        routes: [
+          GoRoute(
+            path: RoutePaths.dashboard,
+            pageBuilder: (context, state) => _fadePage(
+              state: state,
+              child: const DashboardScreen(),
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.transactions,
+            pageBuilder: (context, state) => _fadePage(
+              state: state,
+              child: const TransactionsPlaceholderScreen(),
+            ),
+          ),
+          GoRoute(
+            path: RoutePaths.profile,
+            pageBuilder: (context, state) => _fadePage(
+              state: state,
+              child: const ProfilePlaceholderScreen(),
+            ),
+          ),
+        ],
+      ),
       GoRoute(
-        path: RoutePaths.home,
-        pageBuilder: (context, state) => _fadePage(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.deposit,
+        pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const HomeScreen(),
+          child: const DepositPlaceholderScreen(),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.withdraw,
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: const WithdrawPlaceholderScreen(),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.transfer,
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: const TransferPlaceholderScreen(),
         ),
       ),
     ],

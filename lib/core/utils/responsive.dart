@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../constants/app_constants.dart';
 import '../theme/auth_spacing.dart';
+import '../theme/dashboard_spacing.dart';
 
 abstract final class Responsive {
   static const double tabletBreakpoint = 600;
@@ -49,4 +50,10 @@ abstract final class Responsive {
   static double authCardMaxWidth(BuildContext context) {
     return AppConstants.authCardMaxWidth;
   }
+
+  static double dashboardMaxContentWidth(BuildContext context) {
+    return AppConstants.dashboardContentMaxWidth;
+  }
+
+  static double dashboardHorizontalPadding() => DashboardSpacing.pageHorizontal;
 }
