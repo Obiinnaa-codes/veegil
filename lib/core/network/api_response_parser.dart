@@ -35,6 +35,26 @@ Map<String, dynamic> parseApiEnvelope(Response<dynamic> response) {
   return data;
 }
 
+void parseApiMutationEnvelope(Response<dynamic> response) {
+  final data = response.data;
+  if (data is! Map<String, dynamic>) {
+    throw const ApiException(
+      userMessage: 'Received an invalid response from the server.',
+    );
+  }
+
+  final status = data['status'];
+  if (status == 'error') {
+    final message = data['message'];
+    throw ApiException(
+      userMessage: message is String && message.isNotEmpty
+          ? message
+          : 'Something went wrong. Please try again.',
+      statusCode: response.statusCode,
+    );
+  }
+}
+
 class ApiListPayload {
   const ApiListPayload({
     required this.items,

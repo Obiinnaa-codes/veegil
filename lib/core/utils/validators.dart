@@ -42,4 +42,20 @@ abstract final class Validators {
 
     return null;
   }
+
+  static String? amount(int? value) {
+    if (value == null) {
+      return 'Amount is required';
+    }
+
+    if (value < 0) {
+      return 'Amount cannot be negative';
+    }
+
+    if (value == 0) {
+      return 'Amount must be greater than zero';
+    }
+
+    return null;
+  }
 }

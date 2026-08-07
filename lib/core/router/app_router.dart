@@ -8,7 +8,7 @@ import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
-import '../../features/dashboard/presentation/screens/placeholders/deposit_placeholder_screen.dart';
+import '../../features/deposit/presentation/screens/deposit_screen.dart';
 import '../../features/dashboard/presentation/screens/placeholders/transfer_placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/placeholders/withdraw_placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/tab_placeholder_screens.dart';
@@ -121,7 +121,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.deposit,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const DepositPlaceholderScreen(),
+          child: const DepositScreen(),
         ),
       ),
       GoRoute(
