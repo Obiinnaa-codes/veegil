@@ -1,4 +1,5 @@
 import '../constants/app_constants.dart';
+import 'currency_formatter.dart';
 
 abstract final class Validators {
   static String? phone(String? value) {
@@ -54,6 +55,14 @@ abstract final class Validators {
 
     if (value == 0) {
       return 'Amount must be greater than zero';
+    }
+
+    return null;
+  }
+
+  static String? insufficientBalance(int amount, double availableBalance) {
+    if (amount > availableBalance) {
+      return 'Insufficient balance. Available: ${CurrencyFormatter.format(availableBalance)}';
     }
 
     return null;

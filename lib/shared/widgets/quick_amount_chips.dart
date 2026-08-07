@@ -11,11 +11,13 @@ class QuickAmountChips extends StatelessWidget {
     required this.amounts,
     required this.selectedAmount,
     required this.onSelected,
+    this.accentColor = AppColors.primary,
   });
 
   final List<int> amounts;
   final int? selectedAmount;
   final ValueChanged<int> onSelected;
+  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +39,10 @@ class QuickAmountChips extends StatelessWidget {
               ),
               selected: isSelected,
               showCheckmark: false,
-              selectedColor: AppColors.primary,
+              selectedColor: accentColor,
               backgroundColor: AppColors.surface,
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.border,
+                color: isSelected ? accentColor : AppColors.border,
               ),
               onSelected: (_) => onSelected(amount),
             ),

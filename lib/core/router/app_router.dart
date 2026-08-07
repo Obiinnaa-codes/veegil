@@ -11,7 +11,7 @@ import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/deposit/presentation/screens/deposit_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/dashboard/presentation/screens/placeholders/transfer_placeholder_screen.dart';
-import '../../features/dashboard/presentation/screens/placeholders/withdraw_placeholder_screen.dart';
+import '../../features/withdraw/presentation/screens/withdraw_screen.dart';
 import '../../features/dashboard/presentation/screens/tab_placeholder_screens.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
 import '../../features/dashboard/presentation/widgets/dashboard_shell.dart';
@@ -139,7 +139,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.withdraw,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const WithdrawPlaceholderScreen(),
+          child: const WithdrawScreen(),
         ),
       ),
       GoRoute(

@@ -5,17 +5,18 @@ import '../../../../core/utils/amount_parser.dart';
 import '../../../../core/utils/api_error_mapper.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
+import '../../../dashboard/presentation/controllers/dashboard_controller.dart';
 import '../providers/core_providers.dart';
-import 'deposit_state.dart';
+import 'withdraw_state.dart';
 
-final depositControllerProvider =
-    AsyncNotifierProvider.autoDispose<DepositController, DepositState>(
-  DepositController.new,
+final withdrawControllerProvider =
+    AsyncNotifierProvider.autoDispose<WithdrawController, WithdrawState>(
+  WithdrawController.new,
 );
 
-class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
+class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
   @override
-  Future<DepositState> build() async => DepositState.initial;
+  Future<WithdrawState> build() async => WithdrawState.initial;
 
   void onAmountChanged(String value) {
     final current = state.requireValue;
@@ -24,7 +25,7 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
         amountDisplay: value,
         clearAmountError: true,
         clearSelectedQuickAmount: true,
-        status: DepositStatus.idle,
+        status: WithdrawStatus.idle,
         clearErrorMessage: true,
       ),
     );
@@ -37,13 +38,13 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
         amountDisplay: AmountParser.formatDisplayFromInt(amount),
         selectedQuickAmount: amount,
         clearAmountError: true,
-        status: DepositStatus.idle,
+        status: WithdrawStatus.idle,
         clearErrorMessage: true,
       ),
     );
   }
 
-  Future<void> deposit() async {
+  Future<void> withdraw() async {
     final current = state.requireValue;
     if (current.isLoading) return;
 
@@ -54,7 +55,31 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
       state = AsyncData(
         current.copyWith(
           amountError: amountError,
-          status: DepositStatus.idle,
+          status: WithdrawStatus.idle,
+        ),
+      );
+      return;
+    }
+
+    final balance =
+        ref.read(dashboardControllerProvider).valueOrNull?.balance;
+    if (balance == null) {
+      state = AsyncData(
+        current.copyWith(
+          amountError:
+              'Unable to verify your balance. Please go back and try again.',
+          status: WithdrawStatus.idle,
+        ),
+      );
+      return;
+    }
+
+    final balanceError = Validators.insufficientBalance(amount!, balance);
+    if (balanceError != null) {
+      state = AsyncData(
+        current.copyWith(
+          amountError: balanceError,
+          status: WithdrawStatus.idle,
         ),
       );
       return;
@@ -62,18 +87,18 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
 
     state = AsyncData(
       current.copyWith(
-        status: DepositStatus.loading,
+        status: WithdrawStatus.loading,
         clearErrorMessage: true,
       ),
     );
 
     try {
-      await ref.read(depositRepositoryProvider).deposit(amount!);
+      await ref.read(withdrawRepositoryProvider).withdraw(amount);
 
       state = AsyncData(
         current.copyWith(
-          status: DepositStatus.success,
-          depositedAmount: amount,
+          status: WithdrawStatus.success,
+          withdrawnAmount: amount,
           clearErrorMessage: true,
         ),
       );
@@ -87,7 +112,7 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
 
       state = AsyncData(
         current.copyWith(
-          status: DepositStatus.error,
+          status: WithdrawStatus.error,
           errorMessage: ApiErrorMapper.mapError(error),
         ),
       );
