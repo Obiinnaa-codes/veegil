@@ -9,6 +9,7 @@ import '../../features/auth/presentation/screens/sign_up_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/dashboard/presentation/screens/dashboard_screen.dart';
 import '../../features/deposit/presentation/screens/deposit_screen.dart';
+import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/dashboard/presentation/screens/placeholders/transfer_placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/placeholders/withdraw_placeholder_screen.dart';
 import '../../features/dashboard/presentation/screens/tab_placeholder_screens.dart';
@@ -24,7 +25,8 @@ bool _isAuthenticatedRoute(String location) {
       location == RoutePaths.profile ||
       location == RoutePaths.deposit ||
       location == RoutePaths.withdraw ||
-      location == RoutePaths.transfer;
+      location == RoutePaths.transfer ||
+      location == RoutePaths.notifications;
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -115,6 +117,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.notifications,
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: const NotificationsScreen(),
+        ),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

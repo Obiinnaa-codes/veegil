@@ -9,7 +9,6 @@ import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/section_spacing.dart';
 import '../../domain/entities/account.dart';
 import '../controllers/dashboard_controller.dart';
@@ -40,7 +39,20 @@ class DashboardScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const AppLogo(),
+        centerTitle: false,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.person_outline),
+          tooltip: 'Profile',
+          onPressed: () => context.go(RoutePaths.profile),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: 'Notifications',
+            onPressed: () => context.push(RoutePaths.notifications),
+          ),
+        ],
       ),
       body: SafeArea(
         child: dashboardState.when(

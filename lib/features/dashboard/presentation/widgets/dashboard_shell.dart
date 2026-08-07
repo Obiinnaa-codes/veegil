@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_paths.dart';
-import '../../../../core/theme/app_colors.dart';
 
 class DashboardShell extends StatelessWidget {
   const DashboardShell({super.key, required this.child});
@@ -36,8 +35,6 @@ class DashboardShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) => _onItemTapped(context, index),
-        backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.secondary.withValues(alpha: 0.4),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),

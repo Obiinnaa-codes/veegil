@@ -31,6 +31,44 @@ abstract final class AppTheme {
         titleTextStyle: textTheme.titleLarge,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.surface,
+        indicatorColor: AppColors.secondary.withValues(alpha: 0.4),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          return typography.label.copyWith(
+            color: states.contains(WidgetState.selected)
+                ? AppColors.primary
+                : AppColors.subtitle,
+          );
+        }),
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          return IconThemeData(
+            color: states.contains(WidgetState.selected)
+                ? AppColors.primary
+                : AppColors.subtitle,
+          );
+        }),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.pressed) ||
+                states.contains(WidgetState.hovered)) {
+              return AppColors.primary;
+            }
+            return AppColors.text;
+          }),
+          overlayColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.pressed)) {
+              return AppColors.secondary.withValues(alpha: 0.4);
+            }
+            if (states.contains(WidgetState.hovered)) {
+              return AppColors.secondary.withValues(alpha: 0.2);
+            }
+            return null;
+          }),
+        ),
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.background,
