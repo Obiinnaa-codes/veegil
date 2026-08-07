@@ -9,7 +9,7 @@ import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/responsive_auth_scaffold.dart';
-import '../providers/sign_up_controller.dart';
+import '../controllers/sign_up_controller.dart';
 import '../widgets/auth_footer_link.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -42,6 +42,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(signUpControllerProvider, (previous, next) {
+      final error = next.submission.asError;
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.error.toString())),
+        );
+      }
+    });
+
     final state = ref.watch(signUpControllerProvider);
     final controller = ref.read(signUpControllerProvider.notifier);
 
@@ -95,7 +104,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           const AuthGap.fieldToPrimaryButton(),
           LoadingButton(
             label: 'Create Account',
+            loadingLabel: 'Creating Account...',
             isLoading: state.isLoading,
+            isEnabled: state.isFormValid,
             onPressed: _handleSignUp,
           ),
           const AuthGap.primaryButtonToBottomCta(),

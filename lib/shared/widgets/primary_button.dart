@@ -69,34 +69,48 @@ class LoadingButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isLoading = false,
+    this.isEnabled = true,
+    this.loadingLabel,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isLoading;
+  final bool isEnabled;
+  final String? loadingLabel;
 
   @override
   Widget build(BuildContext context) {
+    final canPress = isEnabled && !isLoading;
+    final displayLabel = isLoading ? (loadingLabel ?? label) : label;
+
     return Semantics(
       button: true,
-      enabled: !isLoading,
-      label: isLoading ? 'Loading' : label,
+      enabled: canPress,
+      label: isLoading ? displayLabel : label,
       child: SizedBox(
         width: double.infinity,
         height: AppConstants.buttonHeight,
         child: ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
+          onPressed: canPress ? onPressed : null,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: isLoading
-                ? const SizedBox(
-                    key: ValueKey('loading'),
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.onPrimary,
-                    ),
+                ? Row(
+                    key: const ValueKey('loading'),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.onPrimary,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(displayLabel),
+                    ],
                   )
                 : Text(
                     label,

@@ -10,7 +10,7 @@ import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/auth_text_link.dart';
 import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/responsive_auth_scaffold.dart';
-import '../providers/login_controller.dart';
+import '../controllers/login_controller.dart';
 import '../widgets/auth_footer_link.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -46,6 +46,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(loginControllerProvider, (previous, next) {
+      final error = next.submission.asError;
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.error.toString())),
+        );
+      }
+    });
+
     final state = ref.watch(loginControllerProvider);
     final controller = ref.read(loginControllerProvider.notifier);
 
@@ -91,7 +100,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           const AuthGap.fieldToPrimaryButton(),
           LoadingButton(
             label: 'Log In',
+            loadingLabel: 'Signing In...',
             isLoading: state.isLoading,
+            isEnabled: state.isFormValid,
             onPressed: _handleLogin,
           ),
           const AuthGap.primaryButtonToBottomCta(),

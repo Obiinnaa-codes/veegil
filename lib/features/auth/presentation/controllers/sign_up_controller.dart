@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/network/api_client.dart';
+import '../../../../core/network/api_exception.dart';
 import '../../../../core/utils/validators.dart';
-import '../../domain/entities/auth_credentials.dart';
-import 'auth_repository_provider.dart';
+import '../controllers/auth_controller.dart';
 
 class SignUpState {
   const SignUpState({
@@ -24,6 +26,11 @@ class SignUpState {
   final AsyncValue<void> submission;
 
   bool get isLoading => submission.isLoading;
+
+  bool get isFormValid =>
+      Validators.phone(phoneNumber) == null &&
+      Validators.password(password) == null &&
+      Validators.confirmPassword(confirmPassword, password) == null;
 
   SignUpState copyWith({
     String? phoneNumber,
@@ -104,24 +111,38 @@ class SignUpController extends Notifier<SignUpState> {
 
   Future<bool> submit() async {
     if (!_validate()) return false;
+    if (state.isLoading) return false;
 
     state = state.copyWith(submission: const AsyncLoading());
 
     try {
-      final repository = ref.read(authRepositoryProvider);
-      await repository.signUp(
-        AuthCredentials(
-          phoneNumber: state.phoneNumber.trim(),
-          password: state.password,
-        ),
-      );
+      await ref.read(authControllerProvider.notifier).signup(
+            phoneNumber: state.phoneNumber.trim(),
+            password: state.password,
+          );
+
+      final authState = ref.read(authControllerProvider);
+      if (authState.hasError) {
+        throw authState.error!;
+      }
+
       state = state.copyWith(submission: const AsyncData(null));
       return true;
     } catch (error, stackTrace) {
       state = state.copyWith(
-        submission: AsyncError(error, stackTrace),
+        submission: AsyncError(_mapError(error), stackTrace),
       );
       return false;
     }
+  }
+
+  String _mapError(Object error) {
+    if (error is DioException) {
+      return error.apiException.userMessage;
+    }
+    if (error is ApiException) {
+      return error.userMessage;
+    }
+    return 'Something went wrong. Please try again.';
   }
 }

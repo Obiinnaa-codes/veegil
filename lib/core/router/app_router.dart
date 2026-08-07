@@ -3,33 +3,62 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants/route_paths.dart';
-import '../../features/auth/presentation/providers/auth_repository_provider.dart';
+import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
+import '../../features/auth/presentation/screens/splash_screen.dart';
 import '../../features/home/presentation/screens/home_screen.dart';
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
+  final refreshNotifier = _RouterRefreshNotifier();
+
+  ref.listen(authControllerProvider, (_, _) {
+    refreshNotifier.notify();
+  });
+
+  ref.onDispose(refreshNotifier.dispose);
 
   return GoRouter(
-    initialLocation: RoutePaths.login,
+    navigatorKey: _rootNavigatorKey,
+    initialLocation: RoutePaths.splash,
     debugLogDiagnostics: false,
-    redirect: (context, state) async {
-      final isAuthenticated = await repository.isAuthenticated();
+    refreshListenable: refreshNotifier,
+    redirect: (context, state) {
+      final authState = ref.read(authControllerProvider);
       final location = state.matchedLocation;
+      final isLoading = authState.isLoading;
+      final isAuthenticated = authState.valueOrNull != null;
 
-      if (isAuthenticated &&
-          (location == RoutePaths.login || location == RoutePaths.signUp)) {
-        return RoutePaths.home;
+      if (isLoading && location != RoutePaths.splash) {
+        return RoutePaths.splash;
       }
 
-      if (!isAuthenticated && location == RoutePaths.home) {
-        return RoutePaths.login;
+      if (!isLoading && isAuthenticated) {
+        if (location == RoutePaths.login ||
+            location == RoutePaths.signUp ||
+            location == RoutePaths.splash) {
+          return RoutePaths.home;
+        }
+      }
+
+      if (!isLoading && !isAuthenticated) {
+        if (location == RoutePaths.home || location == RoutePaths.splash) {
+          return RoutePaths.login;
+        }
       }
 
       return null;
     },
     routes: [
+      GoRoute(
+        path: RoutePaths.splash,
+        pageBuilder: (context, state) => _fadePage(
+          state: state,
+          child: const SplashScreen(),
+        ),
+      ),
       GoRoute(
         path: RoutePaths.login,
         pageBuilder: (context, state) => _slidePage(
@@ -54,6 +83,10 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+class _RouterRefreshNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
 
 CustomTransitionPage<void> _fadePage({
   required GoRouterState state,

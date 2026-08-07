@@ -5,14 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/route_paths.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/widgets/secondary_button.dart';
-import '../../../auth/presentation/providers/auth_repository_provider.dart';
+import '../../../auth/presentation/controllers/auth_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   Future<void> _logout(BuildContext context, WidgetRef ref) async {
-    final repository = ref.read(authRepositoryProvider);
-    await repository.logout();
+    await ref.read(authControllerProvider.notifier).logout();
     if (context.mounted) {
       context.go(RoutePaths.login);
     }
