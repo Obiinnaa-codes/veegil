@@ -12,7 +12,6 @@ import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/section_spacing.dart';
 import '../../domain/entities/account.dart';
 import '../controllers/dashboard_controller.dart';
-import '../widgets/account_summary_card.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/dashboard_error_view.dart';
 import '../widgets/dashboard_greeting.dart';
@@ -126,17 +125,8 @@ class _DashboardBody extends ConsumerWidget {
             ),
           ],
         ),
-        const SectionSpacing.md(),
-        QuickActionCard(
-          label: 'Analytics',
-          icon: Icons.bar_chart_outlined,
-          fullWidth: true,
-          onTap: () => context.push(RoutePaths.analytics),
-        ),
         const SectionSpacing.lg(),
         const RecentTransactionsCard(),
-        const SectionSpacing.lg(),
-        AccountSummaryCard(account: account),
         const SectionSpacing.lg(),
       ],
     );
@@ -152,6 +142,10 @@ class _DashboardScrollContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final minContentHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight - AppSpacing.md * 2
+            : 0.0;
+
         return SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.symmetric(
@@ -162,7 +156,7 @@ class _DashboardScrollContent extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: Responsive.dashboardMaxContentWidth(context),
-                minHeight: constraints.maxHeight - AppSpacing.md * 2,
+                minHeight: minContentHeight,
               ),
               child: child,
             ),

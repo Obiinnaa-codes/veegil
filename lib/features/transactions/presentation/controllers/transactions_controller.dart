@@ -49,7 +49,6 @@ class TransactionsController extends AsyncNotifier<TransactionsState> {
           transactions: page.items,
           meta: page.meta,
           activeFilter: previous?.activeFilter ?? TransactionFilter.all,
-          searchQuery: previous?.searchQuery ?? '',
         ),
       );
     } catch (error, stackTrace) {
@@ -104,12 +103,6 @@ class TransactionsController extends AsyncNotifier<TransactionsState> {
     final current = state.valueOrNull;
     if (current == null) return;
     state = AsyncData(current.copyWith(activeFilter: filter));
-  }
-
-  void setSearchQuery(String query) {
-    final current = state.valueOrNull;
-    if (current == null) return;
-    state = AsyncData(current.copyWith(searchQuery: query));
   }
 
   bool _isUnauthorized(Object error) {

@@ -1,21 +1,21 @@
-import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../dashboard/presentation/widgets/dashboard_error_view.dart';
+import '../../../dashboard/presentation/widgets/dashboard_shimmer.dart';
 import '../controllers/transactions_controller.dart';
 import '../controllers/transactions_state.dart';
 import '../widgets/transaction_filter_chips.dart';
 import '../widgets/transaction_item.dart';
 import '../widgets/transactions_empty_state.dart';
 import '../widgets/transactions_shimmer.dart';
+import '../widgets/transactions_weekly_chart_card.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {
   const TransactionsScreen({super.key});
@@ -25,22 +25,38 @@ class TransactionsScreen extends ConsumerStatefulWidget {
 }
 
 class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
-  final _searchController = TextEditingController();
   final _scrollController = ScrollController();
-  Timer? _searchDebounce;
+  var _isLoadingAllTransactions = false;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    Future.microtask(_ensureAllTransactionsLoaded);
   }
 
   @override
   void dispose() {
-    _searchDebounce?.cancel();
-    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _ensureAllTransactionsLoaded() async {
+    if (_isLoadingAllTransactions || !mounted) return;
+
+    _isLoadingAllTransactions = true;
+    try {
+      final notifier = ref.read(transactionsControllerProvider.notifier);
+      while (mounted) {
+        final state = ref.read(transactionsControllerProvider).valueOrNull;
+        if (state == null || state.meta?.hasMore != true) break;
+        await notifier.loadMore();
+      }
+    } finally {
+      if (mounted) {
+        _isLoadingAllTransactions = false;
+      }
+    }
   }
 
   void _onScroll() {
@@ -52,11 +68,9 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     }
   }
 
-  void _onSearchChanged(String value) {
-    _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 300), () {
-      ref.read(transactionsControllerProvider.notifier).setSearchQuery(value);
-    });
+  Future<void> _onRefresh() async {
+    await ref.read(transactionsControllerProvider.notifier).refresh();
+    await _ensureAllTransactionsLoaded();
   }
 
   String _mapError(Object error) {
@@ -83,10 +97,10 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _SearchField(
-                  controller: _searchController,
-                  enabled: false,
-                  onChanged: _onSearchChanged,
+                ShimmerBox(
+                  width: double.infinity,
+                  height: 260,
+                  borderRadius: AppConstants.cardBorderRadius,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 const TransactionsShimmer(),
@@ -99,15 +113,10 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                 ref.read(transactionsControllerProvider.notifier).refresh(),
           ),
           data: (state) => RefreshIndicator(
-            onRefresh: () =>
-                ref.read(transactionsControllerProvider.notifier).refresh(),
+            onRefresh: _onRefresh,
             child: _TransactionsScrollContent(
               controller: _scrollController,
-              child: _TransactionsBody(
-                state: state,
-                searchController: _searchController,
-                onSearchChanged: _onSearchChanged,
-              ),
+              child: _TransactionsBody(state: state),
             ),
           ),
         ),
@@ -117,15 +126,9 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
 }
 
 class _TransactionsBody extends ConsumerWidget {
-  const _TransactionsBody({
-    required this.state,
-    required this.searchController,
-    required this.onSearchChanged,
-  });
+  const _TransactionsBody({required this.state});
 
   final TransactionsState state;
-  final TextEditingController searchController;
-  final ValueChanged<String> onSearchChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -134,10 +137,7 @@ class _TransactionsBody extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SearchField(
-          controller: searchController,
-          onChanged: onSearchChanged,
-        ),
+        const TransactionsWeeklyChartCard(),
         const SizedBox(height: AppSpacing.md),
         TransactionFilterChips(
           activeFilter: state.activeFilter,
@@ -173,41 +173,6 @@ class _TransactionsBody extends ConsumerWidget {
   }
 }
 
-class _SearchField extends StatelessWidget {
-  const _SearchField({
-    required this.controller,
-    required this.onChanged,
-    this.enabled = true,
-  });
-
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final bool enabled;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      enabled: enabled,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: 'Search transactions',
-        prefixIcon: const Icon(Icons.search, color: AppColors.subtitle),
-        filled: true,
-        fillColor: AppColors.surface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.border),
-        ),
-      ),
-    );
-  }
-}
-
 class _TransactionsScrollContent extends StatelessWidget {
   const _TransactionsScrollContent({
     required this.child,
@@ -221,6 +186,10 @@ class _TransactionsScrollContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        final minContentHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight - AppSpacing.md * 2
+            : 0.0;
+
         return SingleChildScrollView(
           controller: controller,
           physics: const AlwaysScrollableScrollPhysics(),
@@ -232,7 +201,7 @@ class _TransactionsScrollContent extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: Responsive.dashboardMaxContentWidth(context),
-                minHeight: constraints.maxHeight - AppSpacing.md * 2,
+                minHeight: minContentHeight,
               ),
               child: child,
             ),

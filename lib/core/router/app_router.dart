@@ -13,7 +13,7 @@ import '../../features/deposit/presentation/screens/deposit_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/transfer/presentation/screens/transfer_screen.dart';
 import '../../features/withdraw/presentation/screens/withdraw_screen.dart';
-import '../../features/dashboard/presentation/screens/tab_placeholder_screens.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/transactions/presentation/screens/transactions_screen.dart';
 import '../../features/dashboard/presentation/widgets/dashboard_shell.dart';
 
@@ -115,7 +115,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: RoutePaths.profile,
             pageBuilder: (context, state) => _fadePage(
               state: state,
-              child: const ProfilePlaceholderScreen(),
+              child: const ProfileScreen(),
             ),
           ),
         ],

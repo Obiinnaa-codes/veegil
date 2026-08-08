@@ -50,15 +50,23 @@ TransactionDirection _parseDirection(String value) {
 }
 
 TransactionCategory _parseCategory(String? value) {
-  switch (value?.toLowerCase()) {
+  final normalized = value?.toLowerCase();
+  if (normalized == null) return TransactionCategory.unknown;
+
+  switch (normalized) {
     case 'deposit':
       return TransactionCategory.deposit;
     case 'withdraw':
     case 'withdrawal':
       return TransactionCategory.withdraw;
     case 'transfer':
+    case 'transfer_in':
+    case 'transfer_out':
       return TransactionCategory.transfer;
     default:
+      if (normalized.startsWith('transfer_') || normalized.startsWith('transfer')) {
+        return TransactionCategory.transfer;
+      }
       return TransactionCategory.unknown;
   }
 }

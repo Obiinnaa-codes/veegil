@@ -44,7 +44,7 @@ class DashboardShell extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),
             selectedIcon: Icon(Icons.receipt_long),
-            label: 'Activity',
+            label: 'Transactions',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

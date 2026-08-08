@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/primary_card_background.dart';
 import 'dashboard_shimmer.dart';
 
 class BalanceCard extends StatefulWidget {
@@ -56,89 +57,80 @@ class _BalanceCardState extends State<BalanceCard> {
 
     final typography = context.typography;
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        boxShadow: const [
-          BoxShadow(
-            color: AppColors.shadow,
-            blurRadius: 16,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Available Balance',
-                  style: typography.caption.copyWith(
-                    color: AppColors.onPrimary.withValues(alpha: 0.8),
+    return PrimaryCardBackground(
+      borderRadius: AppConstants.cardBorderRadius,
+      child: Padding(
+        padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Available Balance',
+                    style: typography.caption.copyWith(
+                      color: AppColors.onPrimary.withValues(alpha: 0.8),
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                onPressed: () {
-                  setState(() => _isBalanceVisible = !_isBalanceVisible);
-                },
-                icon: Icon(
-                  _isBalanceVisible
-                      ? Icons.visibility_outlined
-                      : Icons.visibility_off_outlined,
-                  color: AppColors.onPrimary,
-                ),
-                tooltip: _isBalanceVisible ? 'Hide balance' : 'Show balance',
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          if (widget.errorMessage != null && widget.balance == null)
-            _ErrorContent(
-              message: widget.errorMessage!,
-              onRetry: widget.onRetry,
-            )
-          else
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(
-                begin: _displayedBalance,
-                end: widget.balance ?? _displayedBalance,
-              ),
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.easeOutCubic,
-              onEnd: () {
-                if (widget.balance != null) {
-                  _displayedBalance = widget.balance!;
-                }
-              },
-              builder: (context, value, child) {
-                final displayText = _isBalanceVisible
-                    ? CurrencyFormatter.format(value)
-                    : '••••••';
-
-                return Text(
-                  displayText,
-                  style: typography.display.copyWith(
+                IconButton(
+                  onPressed: () {
+                    setState(() => _isBalanceVisible = !_isBalanceVisible);
+                  },
+                  icon: Icon(
+                    _isBalanceVisible
+                        ? Icons.visibility_outlined
+                        : Icons.visibility_off_outlined,
                     color: AppColors.onPrimary,
                   ),
-                );
-              },
+                  tooltip: _isBalanceVisible ? 'Hide balance' : 'Show balance',
+                ),
+              ],
             ),
-          if (widget.errorMessage != null && widget.balance != null) ...[
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              widget.errorMessage!,
-              style: typography.label.copyWith(
-                color: AppColors.secondary,
+            if (widget.errorMessage != null && widget.balance == null)
+              _ErrorContent(
+                message: widget.errorMessage!,
+                onRetry: widget.onRetry,
+              )
+            else
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(
+                  begin: _displayedBalance,
+                  end: widget.balance ?? _displayedBalance,
+                ),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                onEnd: () {
+                  if (widget.balance != null) {
+                    _displayedBalance = widget.balance!;
+                  }
+                },
+                builder: (context, value, child) {
+                  final displayText = _isBalanceVisible
+                      ? CurrencyFormatter.format(value)
+                      : '••••••';
+
+                  return Text(
+                    displayText,
+                    style: typography.display.copyWith(
+                      color: AppColors.onPrimary,
+                    ),
+                  );
+                },
               ),
-            ),
+            if (widget.errorMessage != null && widget.balance != null) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                widget.errorMessage!,
+                style: typography.label.copyWith(
+                  color: AppColors.secondary,
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

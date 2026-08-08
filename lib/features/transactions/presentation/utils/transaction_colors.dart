@@ -18,7 +18,14 @@ abstract final class TransactionColors {
   }
 
   static String labelForCategory(TransactionCategory category, {String? note}) {
-    if (note != null && note.isNotEmpty) {
+    switch (note?.toLowerCase()) {
+      case 'transfer_in':
+        return 'Transfer In';
+      case 'transfer_out':
+        return 'Transfer Out';
+    }
+
+    if (note != null && note.isNotEmpty && category == TransactionCategory.unknown) {
       return note[0].toUpperCase() + note.substring(1);
     }
 

@@ -7,22 +7,22 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../core/utils/date_formatter.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
 import '../../../transactions/presentation/utils/transaction_colors.dart';
+import '../controllers/analytics_data.dart';
 
-class AnalyticsBarChart extends StatelessWidget {
-  const AnalyticsBarChart({
+class WeeklyActivityBarChart extends StatelessWidget {
+  const WeeklyActivityBarChart({
     super.key,
-    required this.depositTotal,
-    required this.withdrawalTotal,
-    this.title = 'Bar Chart',
+    required this.dailyActivity,
+    this.title = 'Last 7 days',
     this.subtitle,
     this.compact = false,
     this.showChevron = false,
   });
 
-  final double depositTotal;
-  final double withdrawalTotal;
+  final List<DailyActivity> dailyActivity;
   final String title;
   final String? subtitle;
   final bool compact;
@@ -31,11 +31,17 @@ class AnalyticsBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
-    final chartHeight = _chartHeight(context);
-    final maxValue = [depositTotal, withdrawalTotal, 1.0].reduce(
-      (value, element) => value > element ? value : element,
+    final chartHeight = compact ? 160.0 : 220.0;
+    final maxValue = dailyActivity.fold<double>(
+      0,
+      (max, day) {
+        final dayMax = day.deposits > day.withdrawals
+            ? day.deposits
+            : day.withdrawals;
+        return dayMax > max ? dayMax : max;
+      },
     );
-    final yMax = maxValue * 1.2;
+    final yMax = (maxValue > 0 ? maxValue : 1.0) * 1.2;
 
     return Container(
       width: double.infinity,
@@ -86,6 +92,8 @@ class AnalyticsBarChart extends StatelessWidget {
               BarChartData(
                 maxY: yMax,
                 minY: 0,
+                groupsSpace: compact ? 8 : 12,
+                alignment: BarChartAlignment.spaceAround,
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
@@ -103,89 +111,70 @@ class AnalyticsBarChart extends StatelessWidget {
                   rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: !compact,
-                      reservedSize: compact ? 0 : 52,
-                      getTitlesWidget: (value, meta) {
-                        if (value == 0 || value == meta.max) {
-                          return const SizedBox.shrink();
-                        }
-                        return Text(
-                          _formatAxisLabel(value),
-                          style: typography.caption,
-                        );
-                      },
-                    ),
+                  leftTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
                   ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 28,
+                      reservedSize: 32,
                       getTitlesWidget: (value, meta) {
-                        switch (value.toInt()) {
-                          case 0:
-                            return Padding(
-                              padding: const EdgeInsets.only(top: AppSpacing.sm),
-                              child: Text(
-                                'Deposits',
-                                style: typography.caption,
-                              ),
-                            );
-                          case 1:
-                            return Padding(
-                              padding: const EdgeInsets.only(top: AppSpacing.sm),
-                              child: Text(
-                                'Withdrawals',
-                                style: typography.caption,
-                              ),
-                            );
-                          default:
-                            return const SizedBox.shrink();
+                        final index = value.toInt();
+                        if (index < 0 || index >= dailyActivity.length) {
+                          return const SizedBox.shrink();
                         }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: AppSpacing.sm),
+                          child: Text(
+                            DateFormatter.formatChartDay(
+                              dailyActivity[index].date,
+                            ),
+                            style: typography.label,
+                            textAlign: TextAlign.center,
+                          ),
+                        );
                       },
                     ),
                   ),
                 ),
-                barGroups: [
-                  BarChartGroupData(
-                    x: 0,
+                barGroups: List.generate(dailyActivity.length, (index) {
+                  final day = dailyActivity[index];
+                  return BarChartGroupData(
+                    x: index,
+                    barsSpace: 4,
                     barRods: [
                       BarChartRodData(
-                        toY: depositTotal,
-                        width: compact ? 32 : 40,
+                        toY: day.deposits,
+                        width: compact ? 8 : 10,
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(6),
+                          top: Radius.circular(4),
                         ),
                         color: TransactionColors.forCategory(
                           TransactionCategory.deposit,
                         ),
                       ),
-                    ],
-                  ),
-                  BarChartGroupData(
-                    x: 1,
-                    barRods: [
                       BarChartRodData(
-                        toY: withdrawalTotal,
-                        width: compact ? 32 : 40,
+                        toY: day.withdrawals,
+                        width: compact ? 8 : 10,
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(6),
+                          top: Radius.circular(4),
                         ),
                         color: TransactionColors.forCategory(
                           TransactionCategory.withdraw,
                         ),
                       ),
                     ],
-                  ),
-                ],
+                  );
+                }),
                 barTouchData: BarTouchData(
                   enabled: true,
                   touchTooltipData: BarTouchTooltipData(
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final label = group.x == 0 ? 'Deposits' : 'Withdrawals';
+                      final day = dailyActivity[group.x];
+                      final label = rodIndex == 0 ? 'Deposits' : 'Withdrawals';
+                      final dateLabel = DateFormatter.formatChartDay(day.date);
                       return BarTooltipItem(
-                        '$label\n${CurrencyFormatter.format(rod.toY)}',
+                        '$dateLabel\n$label\n${CurrencyFormatter.format(rod.toY)}',
                         typography.label.copyWith(color: AppColors.surface),
                       );
                     },
@@ -216,25 +205,6 @@ class AnalyticsBarChart extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  double _chartHeight(BuildContext context) {
-    if (compact) return 140;
-    final width = MediaQuery.sizeOf(context).width;
-    if (width >= 600) {
-      return 260;
-    }
-    return 220;
-  }
-
-  String _formatAxisLabel(double value) {
-    if (value >= 1000000) {
-      return '₦${(value / 1000000).toStringAsFixed(1)}M';
-    }
-    if (value >= 1000) {
-      return '₦${(value / 1000).toStringAsFixed(0)}K';
-    }
-    return '₦${value.toStringAsFixed(0)}';
   }
 }
 
