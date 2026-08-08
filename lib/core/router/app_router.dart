@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants/route_paths.dart';
+import '../../features/analytics/presentation/screens/analytics_screen.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/sign_up_screen.dart';
@@ -26,6 +27,7 @@ bool _isAuthenticatedRoute(String location) {
       location == RoutePaths.deposit ||
       location == RoutePaths.withdraw ||
       location == RoutePaths.transfer ||
+      location == RoutePaths.analytics ||
       location == RoutePaths.notifications;
 }
 
@@ -148,6 +150,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) => _slidePage(
           state: state,
           child: const TransferScreen(),
+        ),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: RoutePaths.analytics,
+        pageBuilder: (context, state) => _slidePage(
+          state: state,
+          child: const AnalyticsScreen(),
         ),
       ),
     ],

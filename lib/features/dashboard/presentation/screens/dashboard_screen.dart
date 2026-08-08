@@ -126,6 +126,13 @@ class _DashboardBody extends ConsumerWidget {
             ),
           ],
         ),
+        const SectionSpacing.md(),
+        QuickActionCard(
+          label: 'Analytics',
+          icon: Icons.bar_chart_outlined,
+          fullWidth: true,
+          onTap: () => context.push(RoutePaths.analytics),
+        ),
         const SectionSpacing.lg(),
         const RecentTransactionsCard(),
         const SectionSpacing.lg(),

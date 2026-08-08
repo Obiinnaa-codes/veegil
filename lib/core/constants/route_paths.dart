@@ -8,5 +8,6 @@ abstract final class RoutePaths {
   static const String deposit = '/deposit';
   static const String withdraw = '/withdraw';
   static const String transfer = '/transfer';
+  static const String analytics = '/analytics';
   static const String notifications = '/notifications';
 }
