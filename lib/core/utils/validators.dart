@@ -67,4 +67,14 @@ abstract final class Validators {
 
     return null;
   }
+
+  static String? notSelfPhone(String phone, String? currentPhone) {
+    if (currentPhone == null) return null;
+
+    if (phone.trim() == currentPhone.trim()) {
+      return 'You cannot transfer to your own account';
+    }
+
+    return null;
+  }
 }

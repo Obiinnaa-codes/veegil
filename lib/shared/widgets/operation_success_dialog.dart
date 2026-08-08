@@ -5,10 +5,21 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import 'primary_button.dart';
 
+class OperationSuccessDetail {
+  const OperationSuccessDetail({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+}
+
 Future<void> showOperationSuccessDialog({
   required BuildContext context,
   required String title,
-  required String message,
+  String? message,
+  List<OperationSuccessDetail>? details,
   required VoidCallback onDone,
 }) {
   return showDialog<void>(
@@ -18,6 +29,7 @@ Future<void> showOperationSuccessDialog({
       return OperationSuccessDialog(
         title: title,
         message: message,
+        details: details,
         onDone: () {
           Navigator.of(dialogContext).pop();
           onDone();
@@ -31,12 +43,14 @@ class OperationSuccessDialog extends StatefulWidget {
   const OperationSuccessDialog({
     super.key,
     required this.title,
-    required this.message,
+    this.message,
+    this.details,
     required this.onDone,
   });
 
   final String title;
-  final String message;
+  final String? message;
+  final List<OperationSuccessDetail>? details;
   final VoidCallback onDone;
 
   @override
@@ -76,6 +90,9 @@ class _OperationSuccessDialogState extends State<OperationSuccessDialog>
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final hasMessage =
+        widget.message != null && widget.message!.isNotEmpty;
+    final hasDetails = widget.details != null && widget.details!.isNotEmpty;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -110,12 +127,34 @@ class _OperationSuccessDialogState extends State<OperationSuccessDialog>
                 style: typography.title,
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                widget.message,
-                style: typography.body.copyWith(color: AppColors.subtitle),
-                textAlign: TextAlign.center,
-              ),
+              if (hasMessage) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  widget.message!,
+                  style: typography.body.copyWith(color: AppColors.subtitle),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              if (hasDetails) ...[
+                const SizedBox(height: AppSpacing.md),
+                ...widget.details!.map((detail) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            detail.label,
+                            style: typography.body
+                                .copyWith(color: AppColors.subtitle),
+                          ),
+                          Text(
+                            detail.value,
+                            style: typography.label,
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
               const SizedBox(height: AppSpacing.lg),
               PrimaryButton(
                 label: 'Done',
