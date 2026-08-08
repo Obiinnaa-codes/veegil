@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../domain/entities/transaction_category.dart';
 
 abstract final class TransactionColors {
-  static Color forCategory(TransactionCategory category) {
+  static Color forCategory(BuildContext context, TransactionCategory category) {
+    final colors = context.appColors;
     switch (category) {
       case TransactionCategory.deposit:
         return AppColors.success;
@@ -13,7 +15,7 @@ abstract final class TransactionColors {
       case TransactionCategory.transfer:
         return AppColors.transactionTransfer;
       case TransactionCategory.unknown:
-        return AppColors.subtitle;
+        return colors.subtitle;
     }
   }
 

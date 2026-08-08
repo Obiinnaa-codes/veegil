@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -20,6 +21,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -38,7 +40,7 @@ class LogoutConfirmationDialog extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               'Are you sure you want to sign out?',
-              style: typography.body.copyWith(color: AppColors.subtitle),
+              style: typography.body.copyWith(color: colors.subtitle),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.lg),

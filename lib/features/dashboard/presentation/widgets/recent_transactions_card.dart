@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/route_paths.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
@@ -18,15 +18,16 @@ class RecentTransactionsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final typography = context.typography;
+    final colors = context.appColors;
     final recentTransactions = ref.watch(recentTransactionsProvider);
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../shared/widgets/primary_button.dart';
@@ -18,6 +18,7 @@ class DashboardErrorView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return Center(
       child: Padding(
@@ -28,7 +29,7 @@ class DashboardErrorView extends StatelessWidget {
             Icon(
               Icons.cloud_off_outlined,
               size: 48,
-              color: AppColors.subtitle,
+              color: colors.subtitle,
             ),
             const SizedBox(height: AppSpacing.md),
             Text(

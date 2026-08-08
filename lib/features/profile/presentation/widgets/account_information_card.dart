@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/account_spacing.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/date_formatter.dart';
@@ -19,6 +19,7 @@ class AccountInformationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     final rows = <_InfoRowData>[
       _InfoRowData(
         label: 'Phone Number',
@@ -34,14 +35,14 @@ class AccountInformationCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AccountSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AccountSpacing.cardBorderRadius),
-        border: Border.all(color: AppColors.border),
-        boxShadow: const [
+        border: Border.all(color: colors.border),
+        boxShadow: [
           BoxShadow(
-            color: AppColors.shadow,
+            color: colors.shadow,
             blurRadius: 12,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -51,7 +52,7 @@ class AccountInformationCard extends StatelessWidget {
           for (var i = 0; i < rows.length; i++) ...[
             if (i > 0) ...[
               const SizedBox(height: AppSpacing.md),
-              const Divider(height: 1, thickness: 1, color: AppColors.border),
+              Divider(height: 1, thickness: 1, color: colors.border),
               const SizedBox(height: AppSpacing.md),
             ],
             _InfoRow(label: rows[i].label, value: rows[i].value),

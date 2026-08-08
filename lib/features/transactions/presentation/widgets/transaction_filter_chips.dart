@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -25,6 +26,7 @@ class TransactionFilterChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -37,15 +39,15 @@ class TransactionFilterChips extends StatelessWidget {
               label: Text(
                 entry.value,
                 style: typography.label.copyWith(
-                  color: isSelected ? AppColors.onPrimary : AppColors.text,
+                  color: isSelected ? AppColors.onPrimary : colors.text,
                 ),
               ),
               selected: isSelected,
               showCheckmark: false,
               selectedColor: AppColors.primary,
-              backgroundColor: AppColors.surface,
+              backgroundColor: colors.surface,
               side: BorderSide(
-                color: isSelected ? AppColors.primary : AppColors.border,
+                color: isSelected ? AppColors.primary : colors.border,
               ),
               onSelected: (_) => onFilterChanged(entry.key),
             ),

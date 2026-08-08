@@ -2,7 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
@@ -31,6 +31,7 @@ class AnalyticsBarChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
     final chartHeight = _chartHeight(context);
     final maxValue = [depositTotal, withdrawalTotal, 1.0].reduce(
       (value, element) => value > element ? value : element,
@@ -41,15 +42,15 @@ class AnalyticsBarChart extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.border),
         boxShadow: compact
-            ? const [
+            ? [
                 BoxShadow(
-                  color: AppColors.shadow,
+                  color: colors.shadow,
                   blurRadius: 12,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ]
             : null,
@@ -74,7 +75,7 @@ class AnalyticsBarChart extends StatelessWidget {
               if (showChevron)
                 Icon(
                   Icons.chevron_right,
-                  color: AppColors.subtitle,
+                  color: colors.subtitle,
                   size: 20,
                 ),
             ],
@@ -91,7 +92,7 @@ class AnalyticsBarChart extends StatelessWidget {
                   drawVerticalLine: false,
                   horizontalInterval: yMax / 4,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: AppColors.border,
+                    color: colors.border,
                     strokeWidth: 1,
                   ),
                 ),
@@ -158,6 +159,7 @@ class AnalyticsBarChart extends StatelessWidget {
                           top: Radius.circular(6),
                         ),
                         color: TransactionColors.forCategory(
+                          context,
                           TransactionCategory.deposit,
                         ),
                       ),
@@ -173,6 +175,7 @@ class AnalyticsBarChart extends StatelessWidget {
                           top: Radius.circular(6),
                         ),
                         color: TransactionColors.forCategory(
+                          context,
                           TransactionCategory.withdraw,
                         ),
                       ),
@@ -186,7 +189,7 @@ class AnalyticsBarChart extends StatelessWidget {
                       final label = group.x == 0 ? 'Deposits' : 'Withdrawals';
                       return BarTooltipItem(
                         '$label\n${CurrencyFormatter.format(rod.toY)}',
-                        typography.label.copyWith(color: AppColors.surface),
+                        typography.label.copyWith(color: colors.surface),
                       );
                     },
                   ),
@@ -200,6 +203,7 @@ class AnalyticsBarChart extends StatelessWidget {
             children: [
               _LegendItem(
                 color: TransactionColors.forCategory(
+                  context,
                   TransactionCategory.deposit,
                 ),
                 label: 'Deposits',
@@ -207,6 +211,7 @@ class AnalyticsBarChart extends StatelessWidget {
               const SizedBox(width: AppSpacing.lg),
               _LegendItem(
                 color: TransactionColors.forCategory(
+                  context,
                   TransactionCategory.withdraw,
                 ),
                 label: 'Withdrawals',

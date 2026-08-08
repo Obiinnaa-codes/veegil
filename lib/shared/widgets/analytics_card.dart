@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/account_spacing.dart';
+import '../../core/theme/app_color_extension.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -16,9 +17,10 @@ class AnalyticsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return Material(
-      color: AppColors.surface,
+      color: colors.surface,
       borderRadius: BorderRadius.circular(AccountSpacing.cardBorderRadius),
       child: InkWell(
         onTap: onTap,
@@ -28,12 +30,12 @@ class AnalyticsCard extends StatelessWidget {
           padding: const EdgeInsets.all(AccountSpacing.cardPadding),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AccountSpacing.cardBorderRadius),
-            border: Border.all(color: AppColors.border),
-            boxShadow: const [
+            border: Border.all(color: colors.border),
+            boxShadow: [
               BoxShadow(
-                color: AppColors.shadow,
+                color: colors.shadow,
                 blurRadius: 12,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -71,7 +73,7 @@ class AnalyticsCard extends StatelessWidget {
               ),
               Icon(
                 Icons.chevron_right,
-                color: AppColors.subtitle,
+                color: colors.subtitle,
                 size: AccountSpacing.iconSize,
               ),
             ],

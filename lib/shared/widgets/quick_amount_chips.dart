@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_color_extension.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -22,6 +23,7 @@ class QuickAmountChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -34,15 +36,15 @@ class QuickAmountChips extends StatelessWidget {
               label: Text(
                 CurrencyFormatter.format(amount.toDouble()),
                 style: typography.label.copyWith(
-                  color: isSelected ? AppColors.onPrimary : AppColors.text,
+                  color: isSelected ? AppColors.onPrimary : colors.text,
                 ),
               ),
               selected: isSelected,
               showCheckmark: false,
               selectedColor: accentColor,
-              backgroundColor: AppColors.surface,
+              backgroundColor: colors.surface,
               side: BorderSide(
-                color: isSelected ? accentColor : AppColors.border,
+                color: isSelected ? accentColor : colors.border,
               ),
               onSelected: (_) => onSelected(amount),
             ),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../constants/route_paths.dart';
+import '../theme/auth_theme_scope.dart';
 import '../../features/analytics/presentation/screens/analytics_screen.dart';
 import '../../features/auth/presentation/controllers/auth_controller.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
@@ -76,21 +77,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.splash,
         pageBuilder: (context, state) => _fadePage(
           state: state,
-          child: const SplashScreen(),
+          child: const AuthThemeScope(child: SplashScreen()),
         ),
       ),
       GoRoute(
         path: RoutePaths.login,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const LoginScreen(),
+          child: const AuthThemeScope(child: LoginScreen()),
         ),
       ),
       GoRoute(
         path: RoutePaths.signUp,
         pageBuilder: (context, state) => _slidePage(
           state: state,
-          child: const SignUpScreen(),
+          child: const AuthThemeScope(child: SignUpScreen()),
         ),
       ),
       ShellRoute(

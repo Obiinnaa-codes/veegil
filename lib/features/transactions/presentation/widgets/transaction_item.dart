@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -23,7 +23,8 @@ class TransactionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
-    final accentColor = TransactionColors.forCategory(transaction.category);
+    final colors = context.appColors;
+    final accentColor = TransactionColors.forCategory(context, transaction.category);
     final categoryLabel =
         TransactionColors.labelForCategory(transaction.category, note: transaction.note);
     final directionLabel = _directionLabel(transaction.direction);
@@ -32,9 +33,9 @@ class TransactionItem extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(compact ? AppSpacing.md : AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +89,7 @@ class TransactionItem extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     counterpartyLabel,
-                    style: typography.caption.copyWith(color: AppColors.text),
+                    style: typography.caption.copyWith(color: colors.text),
                   ),
                 ],
               ],

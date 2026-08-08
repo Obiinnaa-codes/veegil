@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_color_extension.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -90,6 +91,7 @@ class _OperationSuccessDialogState extends State<OperationSuccessDialog>
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
     final hasMessage =
         widget.message != null && widget.message!.isNotEmpty;
     final hasDetails = widget.details != null && widget.details!.isNotEmpty;
@@ -131,7 +133,7 @@ class _OperationSuccessDialogState extends State<OperationSuccessDialog>
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   widget.message!,
-                  style: typography.body.copyWith(color: AppColors.subtitle),
+                  style: typography.body.copyWith(color: colors.subtitle),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -145,7 +147,7 @@ class _OperationSuccessDialogState extends State<OperationSuccessDialog>
                           Text(
                             detail.label,
                             style: typography.body
-                                .copyWith(color: AppColors.subtitle),
+                                .copyWith(color: colors.subtitle),
                           ),
                           Text(
                             detail.value,

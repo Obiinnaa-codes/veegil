@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/constants/app_constants.dart';
+import '../../core/theme/app_color_extension.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/auth_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -84,6 +85,7 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
     final hasError = widget.errorText != null;
     final borderRadius =
         BorderRadius.circular(AppConstants.inputBorderRadius);
@@ -96,18 +98,18 @@ class _AppTextFieldState extends State<AppTextField> {
         children: [
           Text(
             widget.label,
-            style: typography.label.copyWith(color: AppColors.text),
+            style: typography.label.copyWith(color: colors.text),
           ),
           const SizedBox(height: AuthSpacing.labelToField),
           Container(
             height: AppConstants.textFieldHeight,
             decoration: BoxDecoration(
               borderRadius: borderRadius,
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: AppColors.inputShadow,
+                  color: colors.inputShadow,
                   blurRadius: 8,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
@@ -128,11 +130,11 @@ class _AppTextFieldState extends State<AppTextField> {
               decoration: InputDecoration(
                 hintText: widget.hint,
                 filled: true,
-                fillColor: AppColors.background,
+                fillColor: colors.background,
                 enabledBorder: OutlineInputBorder(
                   borderRadius: borderRadius,
                   borderSide: BorderSide(
-                    color: hasError ? AppColors.error : AppColors.border,
+                    color: hasError ? AppColors.error : colors.border,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(
@@ -161,7 +163,7 @@ class _AppTextFieldState extends State<AppTextField> {
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
                               key: ValueKey(_obscureText),
-                              color: AppColors.subtitle,
+                              color: colors.subtitle,
                             ),
                           ),
                         ),

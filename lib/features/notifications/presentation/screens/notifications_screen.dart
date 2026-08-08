@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/responsive.dart';
@@ -30,6 +30,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return Scaffold(
       appBar: AppBar(
@@ -61,7 +62,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                             Icon(
                               Icons.notifications_none_outlined,
                               size: 64,
-                              color: AppColors.subtitle.withValues(alpha: 0.6),
+                              color: colors.subtitle.withValues(alpha: 0.6),
                             ),
                             const SizedBox(height: AppSpacing.lg),
                             Text(

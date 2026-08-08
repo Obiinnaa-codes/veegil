@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
@@ -23,9 +24,10 @@ class QuickActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return Material(
-      color: AppColors.surface,
+      color: colors.surface,
       borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
       child: InkWell(
         onTap: onTap,
@@ -38,7 +40,7 @@ class QuickActionCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-            border: Border.all(color: AppColors.border),
+            border: Border.all(color: colors.border),
           ),
           child: fullWidth
               ? Row(
@@ -48,12 +50,12 @@ class QuickActionCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         label,
-                        style: typography.label.copyWith(color: AppColors.text),
+                        style: typography.label.copyWith(color: colors.text),
                       ),
                     ),
                     Icon(
                       Icons.chevron_right,
-                      color: AppColors.subtitle,
+                      color: colors.subtitle,
                       size: 20,
                     ),
                   ],
@@ -65,7 +67,7 @@ class QuickActionCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       label,
-                      style: typography.label.copyWith(color: AppColors.text),
+                      style: typography.label.copyWith(color: colors.text),
                       textAlign: TextAlign.center,
                     ),
                   ],

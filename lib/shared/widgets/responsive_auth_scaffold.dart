@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_color_extension.dart';
 import '../../core/utils/responsive.dart';
 import 'app_logo.dart';
 import 'auth_gap.dart';
@@ -23,8 +23,10 @@ class ResponsiveAuthScaffold extends StatelessWidget {
     final topSpacing = Responsive.topSpacingBeforeLogo(context);
     final bottomSpacing = Responsive.bottomCtaPadding(context);
 
+    final colors = context.appColors;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -53,16 +55,16 @@ class ResponsiveAuthScaffold extends StatelessWidget {
                           : EdgeInsets.zero,
                       decoration: isWide
                           ? BoxDecoration(
-                              color: AppColors.background,
+                              color: colors.background,
                               borderRadius: BorderRadius.circular(
                                 AppConstants.cardBorderRadius,
                               ),
-                              border: Border.all(color: AppColors.border),
-                              boxShadow: const [
+                              border: Border.all(color: colors.border),
+                              boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.shadow,
+                                  color: colors.shadow,
                                   blurRadius: 16,
-                                  offset: Offset(0, 4),
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
                             )

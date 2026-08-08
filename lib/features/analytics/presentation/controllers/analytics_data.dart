@@ -23,7 +23,6 @@ class AnalyticsData {
     required this.last7DaysDeposits,
     required this.last7DaysWithdrawals,
     required this.last7DaysDaily,
-    required this.recentDepositWithdrawals,
   });
 
   final double totalDeposits;
@@ -34,7 +33,6 @@ class AnalyticsData {
   final double last7DaysDeposits;
   final double last7DaysWithdrawals;
   final List<DailyActivity> last7DaysDaily;
-  final List<Transaction> recentDepositWithdrawals;
 
   factory AnalyticsData.fromTransactions(
     List<Transaction> transactions, {
@@ -83,19 +81,6 @@ class AnalyticsData {
       (sum, day) => sum + day.withdrawals,
     );
 
-    final recentDepositWithdrawals = transactions
-        .where(
-          (transaction) =>
-              transaction.category == TransactionCategory.deposit ||
-              transaction.category == TransactionCategory.withdraw,
-        )
-        .toList()
-      ..sort((a, b) {
-        final aCreated = a.created ?? DateTime.fromMillisecondsSinceEpoch(0);
-        final bCreated = b.created ?? DateTime.fromMillisecondsSinceEpoch(0);
-        return bCreated.compareTo(aCreated);
-      });
-
     return AnalyticsData(
       totalDeposits: totalDeposits,
       totalWithdrawals: totalWithdrawals,
@@ -105,8 +90,6 @@ class AnalyticsData {
       last7DaysDeposits: last7DaysDeposits,
       last7DaysWithdrawals: last7DaysWithdrawals,
       last7DaysDaily: last7DaysDaily,
-      recentDepositWithdrawals:
-          recentDepositWithdrawals.take(5).toList(growable: false),
     );
   }
 

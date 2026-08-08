@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -16,7 +16,6 @@ import '../controllers/analytics_data.dart';
 import '../providers/analytics_providers.dart';
 import '../widgets/analytics_bar_chart.dart';
 import '../widgets/analytics_empty_state.dart';
-import '../widgets/analytics_recent_summary.dart';
 import '../widgets/analytics_shimmer.dart';
 import '../widgets/analytics_statistics_section.dart';
 import '../widgets/analytics_summary_card.dart';
@@ -130,13 +129,14 @@ class _AnalyticsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text('This Month', style: typography.title),
         const SectionSpacing.md(),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: colors.border, height: 1),
         const SectionSpacing.md(),
         _MonthTotalRow(
           label: 'Total Deposits',
@@ -148,7 +148,7 @@ class _AnalyticsBody extends StatelessWidget {
           amount: data.totalWithdrawals,
         ),
         const SectionSpacing.lg(),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: colors.border, height: 1),
         const SectionSpacing.lg(),
         AnalyticsSummaryCard(
           depositTotal: data.totalDeposits,
@@ -157,25 +157,19 @@ class _AnalyticsBody extends StatelessWidget {
           withdrawalCount: data.withdrawCount,
         ),
         const SectionSpacing.lg(),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: colors.border, height: 1),
         const SectionSpacing.lg(),
         AnalyticsBarChart(
           depositTotal: data.totalDeposits,
           withdrawalTotal: data.totalWithdrawals,
         ),
         const SectionSpacing.lg(),
-        const Divider(color: AppColors.border, height: 1),
+        Divider(color: colors.border, height: 1),
         const SectionSpacing.lg(),
         AnalyticsStatisticsSection(
           depositCount: data.depositCount,
           withdrawCount: data.withdrawCount,
           transferCount: data.transferCount,
-        ),
-        const SectionSpacing.lg(),
-        const Divider(color: AppColors.border, height: 1),
-        const SectionSpacing.lg(),
-        AnalyticsRecentSummary(
-          transactions: data.recentDepositWithdrawals,
         ),
         const SectionSpacing.lg(),
       ],

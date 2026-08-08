@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 class ShimmerBox extends StatefulWidget {
@@ -40,6 +40,8 @@ class _ShimmerBoxState extends State<ShimmerBox>
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
@@ -51,10 +53,10 @@ class _ShimmerBoxState extends State<ShimmerBox>
             gradient: LinearGradient(
               begin: Alignment(-1 + _controller.value * 2, 0),
               end: Alignment(1 + _controller.value * 2, 0),
-              colors: const [
-                AppColors.border,
-                AppColors.surface,
-                AppColors.border,
+              colors: [
+                colors.border,
+                colors.surface,
+                colors.border,
               ],
             ),
           ),

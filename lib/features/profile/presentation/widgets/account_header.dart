@@ -6,6 +6,7 @@ import '../../../../core/constants/route_paths.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/theme_mode_controller.dart';
 import '../controllers/profile_controller.dart';
 
 class AccountHeader extends ConsumerWidget {
@@ -15,6 +16,7 @@ class AccountHeader extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final typography = context.typography;
     final hasUnread = ref.watch(hasUnreadNotificationsProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -32,7 +34,13 @@ class AccountHeader extends ConsumerWidget {
             ],
           ),
         ),
-        const SizedBox(width: AppSpacing.sm),
+        IconButton(
+          onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
+          icon: Icon(
+            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+          ),
+          tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+        ),
         Stack(
           clipBehavior: Clip.none,
           children: [
