@@ -10,6 +10,8 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/section_spacing.dart';
+import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/utils/transaction_colors.dart';
 import '../../domain/entities/account.dart';
 import '../controllers/dashboard_controller.dart';
 import '../../../../shared/widgets/veegil_refresh_indicator.dart';
@@ -104,7 +106,9 @@ class _DashboardBody extends ConsumerWidget {
             Expanded(
               child: QuickActionCard(
                 label: 'Deposit',
-                icon: Icons.add_circle_outline,
+                icon: TransactionColors.iconForCategory(
+                  TransactionCategory.deposit,
+                ),
                 onTap: () => context.push(RoutePaths.deposit),
               ),
             ),
@@ -112,7 +116,9 @@ class _DashboardBody extends ConsumerWidget {
             Expanded(
               child: QuickActionCard(
                 label: 'Withdraw',
-                icon: Icons.remove_circle_outline,
+                icon: TransactionColors.iconForCategory(
+                  TransactionCategory.withdraw,
+                ),
                 onTap: () => context.push(RoutePaths.withdraw),
               ),
             ),

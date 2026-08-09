@@ -5,12 +5,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/amount_input_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
+import '../../../../shared/widgets/available_balance_banner.dart';
 import '../../../../shared/widgets/loading_button.dart';
+import '../../../../shared/widgets/transaction_confirmation_sheet.dart';
 import '../../../../shared/widgets/transaction_receipt_screen.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
 import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
@@ -37,7 +40,39 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
   }
 
   Future<void> _handleTransfer() async {
-    await ref.read(transferControllerProvider.notifier).transfer();
+    final controller = ref.read(transferControllerProvider.notifier);
+    final details = controller.buildConfirmationDetails();
+    if (details == null || !mounted) return;
+
+    final confirmed = await showTransactionConfirmationSheet(
+      context: context,
+      title: 'Confirm Transfer',
+      message: 'Please review your transfer details.',
+      confirmLabel: 'Transfer',
+      confirmColor: AppColors.transactionTransfer,
+      rows: [
+        TransactionConfirmationRow(
+          label: 'To',
+          value: details.recipientPhone,
+        ),
+        TransactionConfirmationRow(
+          label: 'Amount',
+          value: formatConfirmationAmount(details.amount),
+        ),
+        TransactionConfirmationRow(
+          label: 'Available Balance',
+          value: CurrencyFormatter.format(details.balance),
+        ),
+        TransactionConfirmationRow(
+          label: 'Balance After',
+          value: CurrencyFormatter.format(details.balanceAfter),
+        ),
+      ],
+    );
+
+    if (!confirmed || !mounted) return;
+
+    await controller.transfer();
   }
 
   void _handleSuccess(TransferState state) {
@@ -125,6 +160,8 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
                         children: [
                           const AuthHeader(title: 'Transfer Money'),
                           const AuthGap.titleToContent(),
+                          const AvailableBalanceBanner(),
+                          const SizedBox(height: AppSpacing.md),
                           AppTextField(
                             label: 'Recipient Phone Number',
                             hint: '080xxxxxxxx',

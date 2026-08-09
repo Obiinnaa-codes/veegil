@@ -13,6 +13,8 @@ import '../../../dashboard/presentation/widgets/dashboard_error_view.dart';
 import '../../../dashboard/presentation/widgets/dashboard_shimmer.dart';
 import '../controllers/transactions_controller.dart';
 import '../controllers/transactions_state.dart';
+import '../../domain/entities/transaction_filter.dart';
+import '../utils/transaction_receipt_navigation.dart';
 import '../widgets/transaction_filter_chips.dart';
 import '../widgets/transaction_item.dart';
 import '../widgets/transactions_empty_state.dart';
@@ -148,7 +150,15 @@ class _TransactionsBody extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.lg),
         if (filtered.isEmpty)
-          const TransactionsEmptyState()
+          TransactionsEmptyState(
+            activeFilter: state.activeFilter,
+            hasTransactions: state.transactions.isNotEmpty,
+            onClearFilter: state.activeFilter == TransactionFilter.all
+                ? null
+                : () => ref
+                    .read(transactionsControllerProvider.notifier)
+                    .setFilter(TransactionFilter.all),
+          )
         else
           ListView.separated(
             shrinkWrap: true,
@@ -156,7 +166,14 @@ class _TransactionsBody extends ConsumerWidget {
             itemCount: filtered.length,
             separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.md),
             itemBuilder: (context, index) {
-              return TransactionItem(transaction: filtered[index]);
+              final transaction = filtered[index];
+              return TransactionItem(
+                transaction: transaction,
+                onTap: () => showTransactionReceiptFromHistory(
+                  context,
+                  transaction,
+                ),
+              );
             },
           ),
         if (state.isLoadingMore) ...[

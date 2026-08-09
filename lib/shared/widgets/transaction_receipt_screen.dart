@@ -25,7 +25,7 @@ Future<void> showTransactionReceipt({
           transaction: transaction,
           onClose: () {
             Navigator.of(screenContext).pop();
-            onDone();
+            WidgetsBinding.instance.addPostFrameCallback((_) => onDone());
           },
         );
       },

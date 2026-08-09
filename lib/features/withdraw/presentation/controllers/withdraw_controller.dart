@@ -6,6 +6,7 @@ import '../../../../core/utils/api_error_mapper.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../dashboard/presentation/controllers/dashboard_controller.dart';
+import '../models/withdraw_confirmation_details.dart';
 import '../providers/core_providers.dart';
 import 'withdraw_state.dart';
 
@@ -44,9 +45,8 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
     );
   }
 
-  Future<void> withdraw() async {
+  WithdrawConfirmationDetails? buildConfirmationDetails() {
     final current = state.requireValue;
-    if (current.isLoading) return;
 
     final amount = AmountParser.parseToNairaInt(current.amountDisplay);
     final amountError = Validators.amount(amount);
@@ -58,7 +58,7 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
           status: WithdrawStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
     final balance =
@@ -71,7 +71,7 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
           status: WithdrawStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
     final balanceError = Validators.insufficientBalance(amount!, balance);
@@ -82,8 +82,23 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
           status: WithdrawStatus.idle,
         ),
       );
-      return;
+      return null;
     }
+
+    return WithdrawConfirmationDetails(
+      amount: amount,
+      balance: balance,
+    );
+  }
+
+  Future<void> withdraw() async {
+    final current = state.requireValue;
+    if (current.isLoading) return;
+
+    final details = buildConfirmationDetails();
+    if (details == null) return;
+
+    final amount = details.amount;
 
     state = AsyncData(
       current.copyWith(

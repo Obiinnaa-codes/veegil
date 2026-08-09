@@ -9,6 +9,7 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
 import '../../../transactions/presentation/controllers/transactions_controller.dart';
+import '../../../transactions/presentation/utils/transaction_receipt_navigation.dart';
 import '../../../transactions/presentation/widgets/transaction_item.dart';
 import '../widgets/dashboard_shimmer.dart';
 
@@ -87,6 +88,10 @@ class RecentTransactionsCard extends ConsumerWidget {
                     TransactionItem(
                       transaction: transactions[i],
                       compact: true,
+                      onTap: () => showTransactionReceiptFromHistory(
+                        context,
+                        transactions[i],
+                      ),
                     ),
                     if (i < transactions.length - 1)
                       const SizedBox(height: AppSpacing.sm),

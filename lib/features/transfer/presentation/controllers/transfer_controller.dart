@@ -7,6 +7,7 @@ import '../../../../core/utils/api_error_mapper.dart';
 import '../../../../core/utils/validators.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../dashboard/presentation/controllers/dashboard_controller.dart';
+import '../models/transfer_confirmation_details.dart';
 import '../providers/core_providers.dart';
 import 'transfer_state.dart';
 
@@ -62,9 +63,8 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
     );
   }
 
-  Future<void> transfer() async {
+  TransferConfirmationDetails? buildConfirmationDetails() {
     final current = state.requireValue;
-    if (current.isLoading) return;
 
     final trimmedPhone = current.phoneNumber.trim();
     final phoneError = Validators.phone(trimmedPhone);
@@ -76,7 +76,7 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
           status: TransferStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
     final currentUserPhone =
@@ -91,7 +91,7 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
           status: TransferStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
     final amount = AmountParser.parseToNairaInt(current.amountDisplay);
@@ -104,7 +104,7 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
           status: TransferStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
     final balance =
@@ -117,7 +117,7 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
           status: TransferStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
     final balanceError = Validators.insufficientBalance(amount!, balance);
@@ -128,9 +128,25 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
           status: TransferStatus.idle,
         ),
       );
-      return;
+      return null;
     }
 
+    return TransferConfirmationDetails(
+      recipientPhone: trimmedPhone,
+      amount: amount,
+      balance: balance,
+    );
+  }
+
+  Future<void> transfer() async {
+    final current = state.requireValue;
+    if (current.isLoading) return;
+
+    final details = buildConfirmationDetails();
+    if (details == null) return;
+
+    final trimmedPhone = details.recipientPhone;
+    final amount = details.amount;
     final idempotencyKey =
         current.idempotencyKey ?? _uuid.v4();
 

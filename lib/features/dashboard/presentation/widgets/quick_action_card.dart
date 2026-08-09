@@ -14,17 +14,20 @@ class QuickActionCard extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.fullWidth = false,
+    this.iconColor,
   });
 
   final String label;
   final IconData icon;
   final VoidCallback onTap;
   final bool fullWidth;
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
     final colors = context.appColors;
+    final resolvedIconColor = iconColor ?? AppColors.primary;
 
     return AppSurfaceCard(
       onTap: onTap,
@@ -35,7 +38,7 @@ class QuickActionCard extends StatelessWidget {
       child: fullWidth
           ? Row(
               children: [
-                Icon(icon, color: AppColors.primary, size: 28),
+                Icon(icon, color: resolvedIconColor, size: 28),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Text(
@@ -53,7 +56,7 @@ class QuickActionCard extends StatelessWidget {
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(icon, color: AppColors.primary, size: 28),
+                Icon(icon, color: resolvedIconColor, size: 28),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   label,

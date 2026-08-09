@@ -7,6 +7,7 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
 import '../../domain/entities/transaction.dart';
+import '../../domain/entities/transaction_category.dart';
 import '../../domain/entities/transaction_direction.dart';
 import '../utils/transaction_colors.dart';
 import 'transaction_type_icon.dart';
@@ -16,10 +17,12 @@ class TransactionItem extends StatelessWidget {
     super.key,
     required this.transaction,
     this.compact = false,
+    this.onTap,
   });
 
   final Transaction transaction;
   final bool compact;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +32,28 @@ class TransactionItem extends StatelessWidget {
     final categoryLabel =
         TransactionColors.labelForCategory(transaction.category, note: transaction.note);
     final counterpartyLabel = _counterpartyLabel(transaction);
+    final showsIconBadge = _showsIconBadge(transaction.category);
 
     return AppSurfaceCard(
+      onTap: onTap,
       padding: EdgeInsets.all(compact ? AppSpacing.md : AppSpacing.lg),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          TransactionTypeIcon.forTransaction(
-            transaction: transaction,
-            color: accentColor,
-          ),
+          if (showsIconBadge)
+            TransactionTypeIcon.forTransaction(
+              transaction: transaction,
+              color: accentColor,
+            )
+          else
+            Container(
+              width: 4,
+              height: compact ? 48 : 56,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -79,6 +94,17 @@ class TransactionItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  bool _showsIconBadge(TransactionCategory category) {
+    switch (category) {
+      case TransactionCategory.deposit:
+      case TransactionCategory.withdraw:
+        return true;
+      case TransactionCategory.transfer:
+      case TransactionCategory.unknown:
+        return false;
+    }
   }
 
   String _formatAmount(Transaction transaction) {
