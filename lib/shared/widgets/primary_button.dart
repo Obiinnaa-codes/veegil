@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
+import 'veegil_loading_indicator.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
@@ -100,13 +101,8 @@ class LoadingButton extends StatelessWidget {
                     key: const ValueKey('loading'),
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: onPrimary,
-                        ),
+                      VeegilLoadingIndicator.small(
+                        color: onPrimary,
                       ),
                       const SizedBox(width: 12),
                       Text(displayLabel),

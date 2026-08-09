@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
@@ -23,61 +24,74 @@ class AnalyticsSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _SummaryTile(
-            label: 'Deposits',
-            amount: depositTotal,
-            transactionCount: depositCount,
-            accentColor: AppColors.success,
-          ),
+    final colors = context.appColors;
+
+    return AppSurfaceCard(
+      useContainerHigh: false,
+      padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            Expanded(
+              child: _SummaryColumn(
+                indicatorColor: AppColors.success,
+                label: 'Total Deposits',
+                amount: depositTotal,
+                transactionCount: depositCount,
+              ),
+            ),
+            VerticalDivider(
+              width: 1,
+              thickness: 1,
+              color: colors.outlineVariant,
+            ),
+            Expanded(
+              child: _SummaryColumn(
+                indicatorColor: AppColors.transactionWithdraw,
+                label: 'Total Withdrawals',
+                amount: withdrawalTotal,
+                transactionCount: withdrawalCount,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: _SummaryTile(
-            label: 'Withdrawals',
-            amount: withdrawalTotal,
-            transactionCount: withdrawalCount,
-            accentColor: AppColors.transactionWithdraw,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
 
-class _SummaryTile extends StatelessWidget {
-  const _SummaryTile({
+class _SummaryColumn extends StatelessWidget {
+  const _SummaryColumn({
+    required this.indicatorColor,
     required this.label,
     required this.amount,
     required this.transactionCount,
-    required this.accentColor,
   });
 
+  final Color indicatorColor;
   final String label;
   final double amount;
   final int transactionCount;
-  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final colors = context.appColors;
     final transactionLabel =
         transactionCount == 1 ? 'Transaction' : 'Transactions';
 
-    return AppSurfaceCard(
-      padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                width: 8,
-                height: 8,
+                width: 10,
+                height: 10,
                 decoration: BoxDecoration(
-                  color: accentColor,
+                  color: indicatorColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -85,20 +99,25 @@ class _SummaryTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: typography.caption,
+                  style: typography.caption.copyWith(color: colors.subtitle),
+                  maxLines: 2,
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.sm),
-          Text(
-            CurrencyFormatter.format(amount),
-            style: typography.title,
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              CurrencyFormatter.format(amount),
+              style: typography.heading.copyWith(fontSize: 22),
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             '$transactionCount $transactionLabel',
-            style: typography.caption,
+            style: typography.caption.copyWith(color: colors.subtitle),
           ),
         ],
       ),

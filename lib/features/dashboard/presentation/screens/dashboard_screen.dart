@@ -12,6 +12,7 @@ import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/section_spacing.dart';
 import '../../domain/entities/account.dart';
 import '../controllers/dashboard_controller.dart';
+import '../../../../shared/widgets/veegil_refresh_indicator.dart';
 import '../widgets/balance_card.dart';
 import '../widgets/dashboard_error_view.dart';
 import '../widgets/dashboard_greeting.dart';
@@ -63,7 +64,7 @@ class DashboardScreen extends ConsumerWidget {
             onRetry: () =>
                 ref.read(dashboardControllerProvider.notifier).refresh(),
           ),
-          data: (account) => RefreshIndicator(
+          data: (account) => VeegilRefreshIndicator(
             onRefresh: () =>
                 ref.read(dashboardControllerProvider.notifier).refresh(),
             child: _DashboardScrollContent(

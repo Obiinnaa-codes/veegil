@@ -7,6 +7,8 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
+import '../../../../shared/widgets/veegil_loading_indicator.dart';
+import '../../../../shared/widgets/veegil_refresh_indicator.dart';
 import '../../../dashboard/presentation/widgets/dashboard_error_view.dart';
 import '../../../dashboard/presentation/widgets/dashboard_shimmer.dart';
 import '../controllers/transactions_controller.dart';
@@ -112,7 +114,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
             onRetry: () =>
                 ref.read(transactionsControllerProvider.notifier).refresh(),
           ),
-          data: (state) => RefreshIndicator(
+          data: (state) => VeegilRefreshIndicator(
             onRefresh: _onRefresh,
             child: _TransactionsScrollContent(
               controller: _scrollController,
@@ -160,10 +162,8 @@ class _TransactionsBody extends ConsumerWidget {
         if (state.isLoadingMore) ...[
           const SizedBox(height: AppSpacing.lg),
           const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
+            child: VeegilLoadingIndicator(
+              size: 24,
             ),
           ),
         ],

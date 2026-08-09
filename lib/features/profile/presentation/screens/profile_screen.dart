@@ -7,6 +7,7 @@ import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/analytics_card.dart';
+import '../../../../shared/widgets/veegil_refresh_indicator.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../../dashboard/presentation/controllers/dashboard_controller.dart';
 import '../controllers/profile_controller.dart';
@@ -38,7 +39,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       body: SafeArea(
-        child: RefreshIndicator(
+        child: VeegilRefreshIndicator(
           onRefresh: () => _onRefresh(ref),
           child: LayoutBuilder(
             builder: (context, constraints) {

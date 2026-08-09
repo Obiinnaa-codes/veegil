@@ -232,6 +232,12 @@ abstract final class AppTheme {
         thickness: 1,
         space: 1,
       ),
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: AppColors.primary,
+        linearTrackColor: colors.outlineVariant,
+        circularTrackColor: colors.outlineVariant,
+        linearMinHeight: 4,
+      ),
       dialogTheme: DialogThemeData(
         backgroundColor: colors.surface,
         shape: RoundedRectangleBorder(

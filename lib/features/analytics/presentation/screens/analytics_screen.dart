@@ -1,23 +1,20 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/api_client.dart';
-import '../../../../core/network/api_exception.dart';
-import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/responsive.dart';
-import '../../../../shared/widgets/section_spacing.dart';
-import '../../../dashboard/presentation/widgets/dashboard_error_view.dart';
+import '../../../transactions/domain/entities/transaction_category.dart';
 import '../../../transactions/presentation/controllers/transactions_controller.dart';
 import '../controllers/analytics_data.dart';
 import '../providers/analytics_providers.dart';
-import '../widgets/analytics_bar_chart.dart';
+import '../../../../shared/widgets/veegil_refresh_indicator.dart';
+import '../widgets/analytics_chart_card.dart';
 import '../widgets/analytics_empty_state.dart';
+import '../widgets/analytics_error_view.dart';
+import '../widgets/analytics_insight_card.dart';
 import '../widgets/analytics_shimmer.dart';
-import '../widgets/analytics_statistics_section.dart';
+import '../widgets/analytics_stat_card.dart';
 import '../widgets/analytics_summary_card.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
@@ -58,16 +55,6 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
     }
   }
 
-  String _mapError(Object error) {
-    if (error is DioException) {
-      return error.apiException.userMessage;
-    }
-    if (error is ApiException) {
-      return error.userMessage;
-    }
-    return 'Something went wrong. Please try again.';
-  }
-
   Future<void> _onRefresh() async {
     await ref.read(transactionsControllerProvider.notifier).refresh();
     await _ensureAllTransactionsLoaded();
@@ -87,13 +74,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
           loading: () => _AnalyticsScrollContent(
             child: const AnalyticsShimmer(),
           ),
-          error: (error, _) => DashboardErrorView(
-            message: _mapError(error),
+          error: (_, _) => AnalyticsErrorView(
             onRetry: _onRefresh,
           ),
           data: (state) {
             if (state.transactions.isEmpty) {
-              return RefreshIndicator(
+              return VeegilRefreshIndicator(
                 onRefresh: _onRefresh,
                 child: _AnalyticsScrollContent(
                   child: const AnalyticsEmptyState(),
@@ -108,7 +94,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> {
               );
             }
 
-            return RefreshIndicator(
+            return VeegilRefreshIndicator(
               onRefresh: _onRefresh,
               child: _AnalyticsScrollContent(
                 child: _AnalyticsBody(data: data),
@@ -129,76 +115,99 @@ class _AnalyticsBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
-    final colors = context.appColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('This Month', style: typography.title),
-        const SectionSpacing.md(),
-        Divider(color: colors.border, height: 1),
-        const SectionSpacing.md(),
-        _MonthTotalRow(
-          label: 'Total Deposits',
-          amount: data.totalDeposits,
-        ),
+        Text('Summary', style: typography.title),
         const SizedBox(height: AppSpacing.md),
-        _MonthTotalRow(
-          label: 'Total Withdrawals',
-          amount: data.totalWithdrawals,
-        ),
-        const SectionSpacing.lg(),
-        Divider(color: colors.border, height: 1),
-        const SectionSpacing.lg(),
         AnalyticsSummaryCard(
           depositTotal: data.totalDeposits,
           depositCount: data.depositCount,
           withdrawalTotal: data.totalWithdrawals,
           withdrawalCount: data.withdrawCount,
         ),
-        const SectionSpacing.lg(),
-        Divider(color: colors.border, height: 1),
-        const SectionSpacing.lg(),
-        AnalyticsBarChart(
+        const SizedBox(height: AppSpacing.md),
+        _StatCardsRow(
+          depositTotal: data.totalDeposits,
+          depositCount: data.depositCount,
+          withdrawalTotal: data.totalWithdrawals,
+          withdrawalCount: data.withdrawCount,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        AnalyticsChartCard(
           depositTotal: data.totalDeposits,
           withdrawalTotal: data.totalWithdrawals,
         ),
-        const SectionSpacing.lg(),
-        Divider(color: colors.border, height: 1),
-        const SectionSpacing.lg(),
-        AnalyticsStatisticsSection(
-          depositCount: data.depositCount,
-          withdrawCount: data.withdrawCount,
-          transferCount: data.transferCount,
+        const SizedBox(height: AppSpacing.md),
+        AnalyticsInsightCard(
+          depositTotal: data.totalDeposits,
+          withdrawalTotal: data.totalWithdrawals,
         ),
-        const SectionSpacing.lg(),
+        const SizedBox(height: AppSpacing.lg),
       ],
     );
   }
 }
 
-class _MonthTotalRow extends StatelessWidget {
-  const _MonthTotalRow({
-    required this.label,
-    required this.amount,
+class _StatCardsRow extends StatelessWidget {
+  const _StatCardsRow({
+    required this.depositTotal,
+    required this.depositCount,
+    required this.withdrawalTotal,
+    required this.withdrawalCount,
   });
 
-  final String label;
-  final double amount;
+  final double depositTotal;
+  final int depositCount;
+  final double withdrawalTotal;
+  final int withdrawalCount;
 
   @override
   Widget build(BuildContext context) {
-    final typography = context.typography;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stackVertically = constraints.maxWidth < 400;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: typography.body),
-        Text(
-          CurrencyFormatter.format(amount),
-          style: typography.title,
-        ),
-      ],
+        if (stackVertically) {
+          return Column(
+            children: [
+              AnalyticsStatCard(
+                category: TransactionCategory.deposit,
+                amount: depositTotal,
+                transactionCount: depositCount,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              AnalyticsStatCard(
+                category: TransactionCategory.withdraw,
+                amount: withdrawalTotal,
+                transactionCount: withdrawalCount,
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: AnalyticsStatCard(
+                category: TransactionCategory.deposit,
+                amount: depositTotal,
+                transactionCount: depositCount,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: AnalyticsStatCard(
+                category: TransactionCategory.withdraw,
+                amount: withdrawalTotal,
+                transactionCount: withdrawalCount,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

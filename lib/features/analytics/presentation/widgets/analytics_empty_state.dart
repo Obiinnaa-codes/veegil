@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 
 class AnalyticsEmptyState extends StatelessWidget {
   const AnalyticsEmptyState({super.key});
@@ -13,26 +14,35 @@ class AnalyticsEmptyState extends StatelessWidget {
     final colors = context.appColors;
 
     return Center(
-      child: Padding(
+      child: AppSurfaceCard(
+        useContainerHigh: false,
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.bar_chart_outlined,
-              size: 64,
-              color: colors.subtitle.withValues(alpha: 0.6),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: colors.surfaceContainerHigh,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.bar_chart_outlined,
+                size: 36,
+                color: colors.subtitle.withValues(alpha: 0.7),
+              ),
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              'No Analytics Yet',
+              'No transaction data yet',
               style: typography.title,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              'Make your first transaction to see your financial activity.',
-              style: typography.body,
+              'Make your first deposit or withdrawal to start seeing your financial activity here.',
+              style: typography.body.copyWith(color: colors.subtitle),
               textAlign: TextAlign.center,
             ),
           ],

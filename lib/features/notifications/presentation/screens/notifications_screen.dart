@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/loading_button.dart';
+import '../../../../shared/widgets/veegil_refresh_indicator.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -37,7 +38,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         title: const Text('Notification History'),
       ),
       body: SafeArea(
-        child: RefreshIndicator(
+        child: VeegilRefreshIndicator(
           onRefresh: _refresh,
           child: LayoutBuilder(
             builder: (context, constraints) {

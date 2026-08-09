@@ -23,6 +23,7 @@ dependencies:
   pretty_dio_logger: ^1.4.0
   shared_preferences: ^2.5.3
   uuid: ^4.5.1
+  material3_expressive_loading_indicator: ^0.1.2
 
 dev_dependencies:
   flutter_test:
