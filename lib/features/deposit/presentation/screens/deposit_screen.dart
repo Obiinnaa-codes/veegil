@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/amount_input_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/loading_button.dart';
-import '../../../../shared/widgets/operation_success_dialog.dart';
+import '../../../../shared/widgets/transaction_receipt_screen.dart';
+import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
 import '../controllers/deposit_controller.dart';
 import '../controllers/deposit_state.dart';
 import '../widgets/deposit_quick_amount_chips.dart';
@@ -38,11 +39,15 @@ class _DepositScreenState extends ConsumerState<DepositScreen> {
     final amount = state.depositedAmount;
     if (amount == null) return;
 
-    showOperationSuccessDialog(
+    final transaction = resolveReceiptTransaction(
+      ref: ref,
+      category: TransactionCategory.deposit,
+      amount: amount.toDouble(),
+    );
+
+    showTransactionReceipt(
       context: context,
-      title: 'Deposit Successful',
-      message:
-          '${CurrencyFormatter.format(amount.toDouble())} has been added to your account.',
+      transaction: transaction,
       onDone: () {
         if (mounted) {
           context.pop();

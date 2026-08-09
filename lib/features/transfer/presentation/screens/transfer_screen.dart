@@ -5,14 +5,15 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/amount_input_field.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/loading_button.dart';
-import '../../../../shared/widgets/operation_success_dialog.dart';
+import '../../../../shared/widgets/transaction_receipt_screen.dart';
+import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
 import '../controllers/transfer_controller.dart';
 import '../controllers/transfer_state.dart';
 import '../widgets/transfer_quick_amount_chips.dart';
@@ -44,16 +45,16 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
     final recipient = state.recipientPhoneNumber;
     if (amount == null || recipient == null) return;
 
-    showOperationSuccessDialog(
+    final transaction = resolveReceiptTransaction(
+      ref: ref,
+      category: TransactionCategory.transfer,
+      amount: amount.toDouble(),
+      counterparty: recipient,
+    );
+
+    showTransactionReceipt(
       context: context,
-      title: 'Transfer Successful',
-      details: [
-        OperationSuccessDetail(label: 'Recipient', value: recipient),
-        OperationSuccessDetail(
-          label: 'Amount',
-          value: CurrencyFormatter.format(amount.toDouble()),
-        ),
-      ],
+      transaction: transaction,
       onDone: () {
         if (mounted) {
           context.pop();

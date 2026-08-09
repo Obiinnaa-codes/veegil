@@ -4,13 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/amount_input_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/loading_button.dart';
-import '../../../../shared/widgets/operation_success_dialog.dart';
+import '../../../../shared/widgets/transaction_receipt_screen.dart';
+import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
 import '../controllers/withdraw_controller.dart';
 import '../controllers/withdraw_state.dart';
 import '../widgets/withdraw_quick_amount_chips.dart';
@@ -39,11 +40,15 @@ class _WithdrawScreenState extends ConsumerState<WithdrawScreen> {
     final amount = state.withdrawnAmount;
     if (amount == null) return;
 
-    showOperationSuccessDialog(
+    final transaction = resolveReceiptTransaction(
+      ref: ref,
+      category: TransactionCategory.withdraw,
+      amount: amount.toDouble(),
+    );
+
+    showTransactionReceipt(
       context: context,
-      title: 'Withdrawal Successful',
-      message:
-          '${CurrencyFormatter.format(amount.toDouble())} has been withdrawn from your account.',
+      transaction: transaction,
       onDone: () {
         if (mounted) {
           context.pop();

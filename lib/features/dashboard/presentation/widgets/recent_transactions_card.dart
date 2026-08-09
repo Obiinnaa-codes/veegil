@@ -8,7 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
-import '../../../transactions/presentation/providers/core_providers.dart';
+import '../../../transactions/presentation/controllers/transactions_controller.dart';
 import '../../../transactions/presentation/widgets/transaction_item.dart';
 import '../widgets/dashboard_shimmer.dart';
 
@@ -18,7 +18,7 @@ class RecentTransactionsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final typography = context.typography;
-    final recentTransactions = ref.watch(recentTransactionsProvider);
+    final transactionsState = ref.watch(transactionsControllerProvider);
 
     return AppSurfaceCard(
       padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
@@ -40,7 +40,7 @@ class RecentTransactionsCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.md),
-          recentTransactions.when(
+          transactionsState.when(
             loading: () => Column(
               children: List.generate(
                 3,
@@ -66,7 +66,9 @@ class RecentTransactionsCard extends ConsumerWidget {
                 ),
               ),
             ),
-            data: (transactions) {
+            data: (state) {
+              final transactions = state.transactions.take(5).toList();
+
               if (transactions.isEmpty) {
                 return Center(
                   child: Padding(

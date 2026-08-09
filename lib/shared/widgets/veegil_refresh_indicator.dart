@@ -29,7 +29,9 @@ class VeegilRefreshIndicator extends StatefulWidget {
 class _VeegilRefreshIndicatorState extends State<VeegilRefreshIndicator> {
   RefreshIndicatorStatus? _status;
 
-  bool get _isVisible => _status != null;
+  bool get _isVisible =>
+      _status == RefreshIndicatorStatus.refresh ||
+      _status == RefreshIndicatorStatus.snap;
 
   @override
   Widget build(BuildContext context) {
