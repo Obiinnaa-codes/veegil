@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/utils/phone_formatter.dart';
 import '../../../../core/utils/validators.dart';
 import '../controllers/auth_controller.dart';
 
@@ -73,15 +74,23 @@ class SignUpController extends Notifier<SignUpState> {
 
   void onPhoneChanged(String value) {
     state = state.copyWith(
-      phoneNumber: value,
+      phoneNumber: PhoneFormatter.digitsOnly(value),
       clearPhoneError: true,
+      submission: const AsyncData(null),
     );
   }
 
   void onPasswordChanged(String value) {
+    final confirmPasswordError = state.confirmPassword.isEmpty
+        ? null
+        : Validators.confirmPassword(state.confirmPassword, value);
+
     state = state.copyWith(
       password: value,
       clearPasswordError: true,
+      confirmPasswordError: confirmPasswordError,
+      clearConfirmPasswordError: confirmPasswordError == null,
+      submission: const AsyncData(null),
     );
   }
 
@@ -89,6 +98,7 @@ class SignUpController extends Notifier<SignUpState> {
     state = state.copyWith(
       confirmPassword: value,
       clearConfirmPasswordError: true,
+      submission: const AsyncData(null),
     );
   }
 

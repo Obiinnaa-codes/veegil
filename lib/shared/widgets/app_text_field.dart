@@ -25,6 +25,7 @@ class AppTextField extends StatefulWidget {
     this.onSubmitted,
     this.focusNode,
     this.guidance,
+    this.displayValue,
   });
 
   final String label;
@@ -41,6 +42,7 @@ class AppTextField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
   final FocusNode? focusNode;
   final Widget? guidance;
+  final String Function(String value)? displayValue;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -54,16 +56,19 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.value ?? '');
+    _controller = TextEditingController(
+      text: _displayText(widget.value ?? ''),
+    );
     _obscureText = widget.obscureText;
   }
 
   @override
   void didUpdateWidget(covariant AppTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.value != oldWidget.value && widget.value != _controller.text) {
+    if (widget.value != oldWidget.value &&
+        _displayText(widget.value ?? '') != _controller.text) {
       _isInternalUpdate = true;
-      _controller.text = widget.value ?? '';
+      _controller.text = _displayText(widget.value ?? '');
       _controller.selection = TextSelection.collapsed(
         offset: _controller.text.length,
       );
@@ -83,6 +88,10 @@ class _AppTextFieldState extends State<AppTextField> {
 
   void _toggleVisibility() {
     setState(() => _obscureText = !_obscureText);
+  }
+
+  String _displayText(String value) {
+    return widget.displayValue?.call(value) ?? value;
   }
 
   @override

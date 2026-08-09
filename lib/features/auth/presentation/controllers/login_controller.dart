@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/utils/phone_formatter.dart';
 import '../../../../core/utils/validators.dart';
 import '../controllers/auth_controller.dart';
 
@@ -56,8 +57,9 @@ class LoginController extends Notifier<LoginState> {
 
   void onPhoneChanged(String value) {
     state = state.copyWith(
-      phoneNumber: value,
+      phoneNumber: PhoneFormatter.digitsOnly(value),
       clearPhoneError: true,
+      submission: const AsyncData(null),
     );
   }
 
@@ -65,6 +67,7 @@ class LoginController extends Notifier<LoginState> {
     state = state.copyWith(
       password: value,
       clearPasswordError: true,
+      submission: const AsyncData(null),
     );
   }
 

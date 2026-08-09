@@ -85,6 +85,8 @@ class LoadingButton extends StatelessWidget {
     this.isLoading = false,
     this.isEnabled = true,
     this.loadingLabel,
+    this.disabledHelper,
+    this.onInvalidTap,
   });
 
   final String label;
@@ -92,43 +94,73 @@ class LoadingButton extends StatelessWidget {
   final bool isLoading;
   final bool isEnabled;
   final String? loadingLabel;
+  final String? disabledHelper;
+  final VoidCallback? onInvalidTap;
 
   @override
   Widget build(BuildContext context) {
     final canPress = isEnabled && !isLoading;
     final displayLabel = isLoading ? (loadingLabel ?? label) : label;
     final onPrimary = Theme.of(context).colorScheme.onPrimary;
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Semantics(
-      button: true,
-      enabled: canPress,
-      label: isLoading ? displayLabel : label,
-      child: SizedBox(
-        width: double.infinity,
-        height: AppConstants.buttonHeight,
-        child: FilledButton(
-          onPressed: canPress ? onPressed : null,
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: isLoading
-                ? Row(
-                    key: const ValueKey('loading'),
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      VeegilLoadingIndicator.small(
-                        color: onPrimary,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Semantics(
+          button: true,
+          enabled: !isLoading,
+          label: isLoading ? displayLabel : label,
+          child: SizedBox(
+            width: double.infinity,
+            height: AppConstants.buttonHeight,
+            child: FilledButton(
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      if (!isEnabled) {
+                        onInvalidTap?.call();
+                        return;
+                      }
+                      onPressed?.call();
+                    },
+              style: FilledButton.styleFrom(
+                backgroundColor: canPress ? null : colorScheme.primary.withValues(alpha: 0.45),
+                foregroundColor: onPrimary,
+              ),
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 200),
+                child: isLoading
+                    ? Row(
+                        key: const ValueKey('loading'),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          VeegilLoadingIndicator.small(
+                            color: onPrimary,
+                          ),
+                          const SizedBox(width: 12),
+                          Text(displayLabel),
+                        ],
+                      )
+                    : Text(
+                        label,
+                        key: const ValueKey('label'),
                       ),
-                      const SizedBox(width: 12),
-                      Text(displayLabel),
-                    ],
-                  )
-                : Text(
-                    label,
-                    key: const ValueKey('label'),
-                  ),
+              ),
+            ),
           ),
         ),
-      ),
+        if (!canPress && disabledHelper != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            disabledHelper!,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+          ),
+        ],
+      ],
     );
   }
 }

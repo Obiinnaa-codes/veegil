@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_color_extension.dart';
+import '../../core/theme/auth_spacing.dart';
 import '../../core/utils/responsive.dart';
 import '../../features/auth/presentation/widgets/auth_illustration_carousel.dart';
 import 'auth_gap.dart';
@@ -20,10 +21,13 @@ class ResponsiveAuthScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final isWide = Responsive.isTablet(context);
     final horizontalPadding = Responsive.authHorizontalPadding();
-    final topSpacing = Responsive.topSpacingBeforeIllustration(context);
     final bottomSpacing = Responsive.bottomCtaPadding(context);
-
     final colors = context.appColors;
+    final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final showCarousel = showIllustration && !keyboardOpen;
+    final topSpacing = keyboardOpen
+        ? AuthSpacing.labelToField
+        : Responsive.topSpacingBeforeIllustration(context);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -31,6 +35,7 @@ class ResponsiveAuthScaffold extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               padding: EdgeInsets.only(
                 left: horizontalPadding,
                 right: horizontalPadding,
@@ -74,10 +79,20 @@ class ResponsiveAuthScaffold extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SizedBox(height: topSpacing),
-                          if (showIllustration) ...[
-                            const AuthIllustrationCarousel(),
-                            const AuthGap.illustrationToTitle(),
-                          ],
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 250),
+                            curve: Curves.easeOutCubic,
+                            alignment: Alignment.topCenter,
+                            child: showCarousel
+                                ? const Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      AuthIllustrationCarousel(),
+                                      AuthGap.illustrationToTitle(),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
                           child,
                           SizedBox(height: bottomSpacing),
                         ],
