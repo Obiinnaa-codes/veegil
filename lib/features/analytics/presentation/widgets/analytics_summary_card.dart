@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
-import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 
 class AnalyticsSummaryCard extends StatelessWidget {
   const AnalyticsSummaryCard({
@@ -64,17 +63,11 @@ class _SummaryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
-    final colors = context.appColors;
     final transactionLabel =
         transactionCount == 1 ? 'Transaction' : 'Transactions';
 
-    return Container(
+    return AppSurfaceCard(
       padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: colors.border),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

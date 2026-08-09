@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/transaction_direction.dart';
 import '../utils/transaction_colors.dart';
@@ -30,13 +30,8 @@ class TransactionItem extends StatelessWidget {
     final directionLabel = _directionLabel(transaction.direction);
     final counterpartyLabel = _counterpartyLabel(transaction);
 
-    return Container(
+    return AppSurfaceCard(
       padding: EdgeInsets.all(compact ? AppSpacing.md : AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: colors.border),
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

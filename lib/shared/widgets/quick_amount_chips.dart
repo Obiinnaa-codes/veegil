@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_color_extension.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_spacing.dart';
-import '../../core/theme/app_typography.dart';
 import '../../core/utils/currency_formatter.dart';
 
 class QuickAmountChips extends StatelessWidget {
@@ -22,8 +20,8 @@ class QuickAmountChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final typography = context.typography;
     final colors = context.appColors;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -31,20 +29,18 @@ class QuickAmountChips extends StatelessWidget {
         children: amounts.map((amount) {
           final isSelected = selectedAmount == amount;
           return Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
-              label: Text(
-                CurrencyFormatter.format(amount.toDouble()),
-                style: typography.label.copyWith(
-                  color: isSelected ? AppColors.onPrimary : colors.text,
-                ),
-              ),
+              label: Text(CurrencyFormatter.format(amount.toDouble())),
               selected: isSelected,
               showCheckmark: false,
               selectedColor: accentColor,
-              backgroundColor: colors.surface,
+              backgroundColor: colors.surfaceContainerHigh,
+              labelStyle: TextStyle(
+                color: isSelected ? colorScheme.onPrimary : colors.text,
+              ),
               side: BorderSide(
-                color: isSelected ? accentColor : colors.border,
+                color: isSelected ? accentColor : colors.outlineVariant,
               ),
               onSelected: (_) => onSelected(amount),
             ),

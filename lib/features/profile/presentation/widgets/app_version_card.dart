@@ -5,6 +5,7 @@ import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 
 class AppVersionCard extends StatelessWidget {
   const AppVersionCard({
@@ -19,21 +20,8 @@ class AppVersionCard extends StatelessWidget {
     final typography = context.typography;
     final colors = context.appColors;
 
-    return Container(
-      width: double.infinity,
+    return AppSurfaceCard(
       padding: const EdgeInsets.all(AccountSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AccountSpacing.cardBorderRadius),
-        border: Border.all(color: colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow,
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Row(
         children: [
           Container(

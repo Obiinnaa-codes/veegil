@@ -199,7 +199,7 @@ CustomTransitionPage<void> _slidePage({
       ).animate(
         CurvedAnimation(
           parent: animation,
-          curve: Curves.easeOutCubic,
+          curve: Curves.easeOutBack,
         ),
       );
 

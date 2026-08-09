@@ -1,12 +1,12 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/currency_formatter.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
 import '../../../transactions/presentation/utils/transaction_colors.dart';
 
@@ -38,23 +38,8 @@ class AnalyticsBarChart extends StatelessWidget {
     );
     final yMax = maxValue * 1.2;
 
-    return Container(
-      width: double.infinity,
+    return AppSurfaceCard(
       padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: colors.border),
-        boxShadow: compact
-            ? [
-                BoxShadow(
-                  color: colors.shadow,
-                  blurRadius: 12,
-                  offset: const Offset(0, 2),
-                ),
-              ]
-            : null,
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

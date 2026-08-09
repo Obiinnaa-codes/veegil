@@ -24,9 +24,6 @@ class LogoutConfirmationDialog extends StatelessWidget {
     final colors = context.appColors;
 
     return Dialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-      ),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
@@ -56,9 +53,9 @@ class LogoutConfirmationDialog extends StatelessWidget {
                 Expanded(
                   child: SizedBox(
                     height: AppConstants.buttonHeight,
-                    child: ElevatedButton(
+                    child: FilledButton(
                       onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
+                      style: FilledButton.styleFrom(
                         backgroundColor: AppColors.error,
                         foregroundColor: AppColors.onPrimary,
                       ),

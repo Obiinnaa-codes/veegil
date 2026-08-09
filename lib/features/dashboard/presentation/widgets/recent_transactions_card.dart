@@ -4,10 +4,10 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/route_paths.dart';
-import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 import '../../../transactions/presentation/providers/core_providers.dart';
 import '../../../transactions/presentation/widgets/transaction_item.dart';
 import '../widgets/dashboard_shimmer.dart';
@@ -18,17 +18,10 @@ class RecentTransactionsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final typography = context.typography;
-    final colors = context.appColors;
     final recentTransactions = ref.watch(recentTransactionsProvider);
 
-    return Container(
-      width: double.infinity,
+    return AppSurfaceCard(
       padding: const EdgeInsets.all(DashboardSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        border: Border.all(color: colors.border),
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

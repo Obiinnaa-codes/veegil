@@ -80,8 +80,8 @@ class _WithdrawScreenState extends ConsumerState<WithdrawScreen> {
 
     return Theme(
       data: Theme.of(context).copyWith(
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
             backgroundColor: AppColors.transactionWithdraw,
             foregroundColor: AppColors.onPrimary,
             disabledBackgroundColor:

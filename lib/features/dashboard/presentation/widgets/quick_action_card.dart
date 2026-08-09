@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 
 class QuickActionCard extends StatelessWidget {
   const QuickActionCard({
@@ -26,54 +26,42 @@ class QuickActionCard extends StatelessWidget {
     final typography = context.typography;
     final colors = context.appColors;
 
-    return Material(
-      color: colors.surface,
-      borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-        child: Container(
-          width: fullWidth ? double.infinity : null,
-          padding: EdgeInsets.symmetric(
-            vertical: DashboardSpacing.cardPadding,
-            horizontal: fullWidth ? DashboardSpacing.cardPadding : AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-            border: Border.all(color: colors.border),
-          ),
-          child: fullWidth
-              ? Row(
-                  children: [
-                    Icon(icon, color: AppColors.primary, size: 28),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: Text(
-                        label,
-                        style: typography.label.copyWith(color: colors.text),
-                      ),
-                    ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: colors.subtitle,
-                      size: 20,
-                    ),
-                  ],
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(icon, color: AppColors.primary, size: 28),
-                    const SizedBox(height: AppSpacing.sm),
-                    Text(
-                      label,
-                      style: typography.label.copyWith(color: colors.text),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-        ),
+    return AppSurfaceCard(
+      onTap: onTap,
+      padding: EdgeInsets.symmetric(
+        vertical: DashboardSpacing.cardPadding,
+        horizontal: fullWidth ? DashboardSpacing.cardPadding : AppSpacing.sm,
       ),
+      child: fullWidth
+          ? Row(
+              children: [
+                Icon(icon, color: AppColors.primary, size: 28),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: typography.label.copyWith(color: colors.text),
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: colors.subtitle,
+                  size: 20,
+                ),
+              ],
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: AppColors.primary, size: 28),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  label,
+                  style: typography.label.copyWith(color: colors.text),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
     );
   }
 }

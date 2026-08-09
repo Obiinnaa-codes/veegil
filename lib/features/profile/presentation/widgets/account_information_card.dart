@@ -4,8 +4,8 @@ import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/utils/phone_formatter.dart';
+import '../../../../shared/widgets/app_surface_card.dart';
 
 class AccountInformationCard extends StatelessWidget {
   const AccountInformationCard({
@@ -25,34 +25,18 @@ class AccountInformationCard extends StatelessWidget {
         label: 'Phone Number',
         value: PhoneFormatter.mask(phoneNumber),
       ),
-      // _InfoRowData(
-      //   label: 'Member Since',
-      //   value: DateFormatter.format(memberSince),
-      // ),
+
     ];
 
-    return Container(
-      width: double.infinity,
+    return AppSurfaceCard(
       padding: const EdgeInsets.all(AccountSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(AccountSpacing.cardBorderRadius),
-        border: Border.all(color: colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow,
-            blurRadius: 12,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (var i = 0; i < rows.length; i++) ...[
             if (i > 0) ...[
               const SizedBox(height: AppSpacing.md),
-              Divider(height: 1, thickness: 1, color: colors.border),
+              Divider(height: 1, thickness: 1, color: colors.outlineVariant),
               const SizedBox(height: AppSpacing.md),
             ],
             _InfoRow(label: rows[i].label, value: rows[i].value),

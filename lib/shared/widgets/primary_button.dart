@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../core/constants/app_constants.dart';
-import '../../core/theme/app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
@@ -24,7 +23,7 @@ class PrimaryButton extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         height: AppConstants.buttonHeight,
-        child: ElevatedButton(
+        child: FilledButton(
           onPressed: isEnabled ? onPressed : null,
           child: Text(label),
         ),
@@ -83,6 +82,7 @@ class LoadingButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final canPress = isEnabled && !isLoading;
     final displayLabel = isLoading ? (loadingLabel ?? label) : label;
+    final onPrimary = Theme.of(context).colorScheme.onPrimary;
 
     return Semantics(
       button: true,
@@ -91,7 +91,7 @@ class LoadingButton extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         height: AppConstants.buttonHeight,
-        child: ElevatedButton(
+        child: FilledButton(
           onPressed: canPress ? onPressed : null,
           child: AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
@@ -100,12 +100,12 @@ class LoadingButton extends StatelessWidget {
                     key: const ValueKey('loading'),
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const SizedBox(
+                      SizedBox(
                         width: 20,
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: AppColors.onPrimary,
+                          color: onPrimary,
                         ),
                       ),
                       const SizedBox(width: 12),

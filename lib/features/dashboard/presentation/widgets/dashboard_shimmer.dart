@@ -55,7 +55,7 @@ class _ShimmerBoxState extends State<ShimmerBox>
               end: Alignment(1 + _controller.value * 2, 0),
               colors: [
                 colors.border,
-                colors.surface,
+                colors.surfaceContainerHigh,
                 colors.border,
               ],
             ),

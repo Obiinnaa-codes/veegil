@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/app_typography.dart';
 import '../../domain/entities/transaction_filter.dart';
 
 class TransactionFilterChips extends StatelessWidget {
@@ -25,8 +23,8 @@ class TransactionFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final typography = context.typography;
     final colors = context.appColors;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -34,20 +32,20 @@ class TransactionFilterChips extends StatelessWidget {
         children: _filters.entries.map((entry) {
           final isSelected = activeFilter == entry.key;
           return Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            padding: const EdgeInsets.only(right: 8),
             child: FilterChip(
-              label: Text(
-                entry.value,
-                style: typography.label.copyWith(
-                  color: isSelected ? AppColors.onPrimary : colors.text,
-                ),
-              ),
+              label: Text(entry.value),
               selected: isSelected,
               showCheckmark: false,
               selectedColor: AppColors.primary,
-              backgroundColor: colors.surface,
+              backgroundColor: colors.surfaceContainerHigh,
+              labelStyle: TextStyle(
+                color: isSelected ? colorScheme.onPrimary : colors.text,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+              ),
               side: BorderSide(
-                color: isSelected ? AppColors.primary : colors.border,
+                color:
+                    isSelected ? AppColors.primary : colors.outlineVariant,
               ),
               onSelected: (_) => onFilterChanged(entry.key),
             ),

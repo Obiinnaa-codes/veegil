@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_color_extension.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_shape_extension.dart';
 import '../../core/theme/auth_spacing.dart';
 import '../../core/theme/app_typography.dart';
 
@@ -86,9 +87,9 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget build(BuildContext context) {
     final typography = context.typography;
     final colors = context.appColors;
+    final shapes = context.appShapes;
     final hasError = widget.errorText != null;
-    final borderRadius =
-        BorderRadius.circular(AppConstants.inputBorderRadius);
+    final borderRadius = shapes.inputBorderRadius;
 
     return Semantics(
       textField: true,
@@ -134,7 +135,7 @@ class _AppTextFieldState extends State<AppTextField> {
                 enabledBorder: OutlineInputBorder(
                   borderRadius: borderRadius,
                   borderSide: BorderSide(
-                    color: hasError ? AppColors.error : colors.border,
+                    color: hasError ? AppColors.error : colors.outlineVariant,
                   ),
                 ),
                 focusedBorder: OutlineInputBorder(

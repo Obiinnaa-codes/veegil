@@ -90,8 +90,8 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
 
     return Theme(
       data: Theme.of(context).copyWith(
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
             backgroundColor: AppColors.transactionTransfer,
             foregroundColor: AppColors.onPrimary,
             disabledBackgroundColor:
