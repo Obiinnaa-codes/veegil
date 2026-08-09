@@ -7,6 +7,7 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
+import '../../../../shared/widgets/inline_error_view.dart';
 import '../../../../shared/widgets/veegil_loading_indicator.dart';
 import '../../../../shared/widgets/veegil_refresh_indicator.dart';
 import '../../../dashboard/presentation/widgets/dashboard_error_view.dart';
@@ -182,6 +183,15 @@ class _TransactionsBody extends ConsumerWidget {
             child: VeegilLoadingIndicator(
               size: 24,
             ),
+          ),
+        ],
+        if (state.loadMoreErrorMessage != null) ...[
+          const SizedBox(height: AppSpacing.md),
+          InlineErrorView(
+            message: state.loadMoreErrorMessage!,
+            onRetry: () =>
+                ref.read(transactionsControllerProvider.notifier).loadMore(),
+            compact: true,
           ),
         ],
         const SizedBox(height: AppSpacing.lg),

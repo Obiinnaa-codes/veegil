@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/utils/api_error_mapper.dart';
 import '../../../auth/presentation/controllers/auth_controller.dart';
 import '../../domain/entities/transaction_filter.dart';
 import '../providers/core_providers.dart';
@@ -73,7 +74,10 @@ class TransactionsController extends AsyncNotifier<TransactionsState> {
       return;
     }
 
-    state = AsyncData(current.copyWith(isLoadingMore: true));
+    state = AsyncData(current.copyWith(
+      isLoadingMore: true,
+      clearLoadMoreError: true,
+    ));
 
     try {
       final repository = ref.read(transactionRepositoryProvider);
@@ -87,6 +91,7 @@ class TransactionsController extends AsyncNotifier<TransactionsState> {
         transactions: [...current.transactions, ...page.items],
         meta: page.meta,
         isLoadingMore: false,
+        clearLoadMoreError: true,
       );
       state = AsyncData(updated);
     } catch (error) {
@@ -95,7 +100,12 @@ class TransactionsController extends AsyncNotifier<TransactionsState> {
         return;
       }
 
-      state = AsyncData(current.copyWith(isLoadingMore: false));
+      state = AsyncData(
+        current.copyWith(
+          isLoadingMore: false,
+          loadMoreErrorMessage: ApiErrorMapper.mapError(error),
+        ),
+      );
     }
   }
 

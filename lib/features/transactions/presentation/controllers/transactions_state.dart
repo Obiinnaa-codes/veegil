@@ -9,12 +9,14 @@ class TransactionsState {
     this.meta,
     this.activeFilter = TransactionFilter.all,
     this.isLoadingMore = false,
+    this.loadMoreErrorMessage,
   });
 
   final List<Transaction> transactions;
   final PageMeta? meta;
   final TransactionFilter activeFilter;
   final bool isLoadingMore;
+  final String? loadMoreErrorMessage;
 
   List<Transaction> get filteredTransactions {
     return transactions.where(_matchesFilter).toList();
@@ -38,12 +40,17 @@ class TransactionsState {
     PageMeta? meta,
     TransactionFilter? activeFilter,
     bool? isLoadingMore,
+    String? loadMoreErrorMessage,
+    bool clearLoadMoreError = false,
   }) {
     return TransactionsState(
       transactions: transactions ?? this.transactions,
       meta: meta ?? this.meta,
       activeFilter: activeFilter ?? this.activeFilter,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      loadMoreErrorMessage: clearLoadMoreError
+          ? null
+          : (loadMoreErrorMessage ?? this.loadMoreErrorMessage),
     );
   }
 }

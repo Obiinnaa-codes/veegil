@@ -8,6 +8,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
+import '../../../../shared/widgets/inline_error_view.dart';
 import '../../../transactions/presentation/controllers/transactions_controller.dart';
 import '../../../transactions/presentation/utils/transaction_receipt_navigation.dart';
 import '../../../transactions/presentation/widgets/transaction_item.dart';
@@ -57,15 +58,12 @@ class RecentTransactionsCard extends ConsumerWidget {
                 ),
               ),
             ),
-            error: (_, _) => Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
-                child: Text(
-                  'Unable to load recent transactions.',
-                  style: typography.caption,
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            error: (_, _) => InlineErrorView(
+              message: 'Unable to load recent transactions.',
+              onRetry: () => ref
+                  .read(transactionsControllerProvider.notifier)
+                  .refresh(),
+              compact: true,
             ),
             data: (state) {
               final transactions = state.transactions.take(5).toList();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -105,15 +106,11 @@ class TransactionReceiptDetailItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final valueWidget = row.isSelectable && showTooltip
-        ? Tooltip(
-            message: row.value,
-            child: Text(
-              row.value,
-              style: valueStyle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+    final valueWidget = row.isSelectable
+        ? _CopyableValue(
+            value: row.value,
+            valueStyle: valueStyle,
+            showTooltip: showTooltip,
           )
         : Text(
             row.value,
@@ -191,6 +188,67 @@ class TransactionReceiptDetailsCard extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+class _CopyableValue extends StatelessWidget {
+  const _CopyableValue({
+    required this.value,
+    required this.valueStyle,
+    required this.showTooltip,
+  });
+
+  final String value;
+  final TextStyle valueStyle;
+  final bool showTooltip;
+
+  Future<void> _copy(BuildContext context) async {
+    await Clipboard.setData(ClipboardData(text: value));
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Transaction ID copied')),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    final text = Text(
+      value,
+      style: valueStyle,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+
+    final content = Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () => _copy(context),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+          child: Row(
+            children: [
+              Expanded(child: showTooltip ? Tooltip(message: value, child: text) : text),
+              const SizedBox(width: AppSpacing.xs),
+              Icon(
+                Icons.copy_outlined,
+                size: 18,
+                color: colors.primary,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    return Semantics(
+      button: true,
+      label: 'Copy transaction ID',
+      child: content,
     );
   }
 }

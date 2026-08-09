@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/app_haptics.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/currency_formatter.dart';
@@ -10,6 +11,7 @@ import '../../../../shared/widgets/amount_input_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/available_balance_banner.dart';
+import '../../../../shared/widgets/inline_error_view.dart';
 import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/transaction_confirmation_sheet.dart';
 import '../../../../shared/widgets/transaction_receipt_screen.dart';
@@ -68,6 +70,8 @@ class _WithdrawScreenState extends ConsumerState<WithdrawScreen> {
   }
 
   void _handleSuccess(WithdrawState state) {
+    AppHaptics.success();
+
     final amount = state.withdrawnAmount;
     if (amount == null) return;
 
@@ -132,8 +136,12 @@ class _WithdrawScreenState extends ConsumerState<WithdrawScreen> {
         ),
         body: SafeArea(
           child: withdrawState.hasError
-              ? const Center(
-                  child: Text('Something went wrong. Please try again.'),
+              ? Center(
+                  child: InlineErrorView(
+                    message: 'Something went wrong. Please try again.',
+                    onRetry: () =>
+                        ref.invalidate(withdrawControllerProvider),
+                  ),
                 )
               : SingleChildScrollView(
                   padding: EdgeInsets.symmetric(

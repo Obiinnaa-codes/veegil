@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/utils/app_haptics.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/utils/responsive.dart';
 import '../../../../shared/widgets/amount_input_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
+import '../../../../shared/widgets/inline_error_view.dart';
 import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/transaction_receipt_screen.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
@@ -36,6 +38,8 @@ class _DepositScreenState extends ConsumerState<DepositScreen> {
   }
 
   void _handleSuccess(DepositState state) {
+    AppHaptics.success();
+
     final amount = state.depositedAmount;
     if (amount == null) return;
 
@@ -88,8 +92,12 @@ class _DepositScreenState extends ConsumerState<DepositScreen> {
       ),
       body: SafeArea(
         child: depositState.hasError
-            ? const Center(
-                child: Text('Something went wrong. Please try again.'),
+            ? Center(
+                child: InlineErrorView(
+                  message: 'Something went wrong. Please try again.',
+                  onRetry: () =>
+                      ref.invalidate(depositControllerProvider),
+                ),
               )
             : SingleChildScrollView(
                 padding: EdgeInsets.symmetric(

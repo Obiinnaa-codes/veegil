@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/utils/phone_formatter.dart';
 import '../../../../core/theme/app_typography.dart';
 
 class DashboardGreeting extends StatelessWidget {
@@ -19,7 +20,7 @@ class DashboardGreeting extends StatelessWidget {
 
   String _subtitle() {
     if (phoneNumber != null && phoneNumber!.isNotEmpty) {
-      return phoneNumber!;
+      return PhoneFormatter.mask(phoneNumber!);
     }
     return 'Welcome Back';
   }

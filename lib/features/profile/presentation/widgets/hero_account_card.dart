@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/phone_formatter.dart';
 import '../../../../shared/widgets/primary_card_background.dart';
 
 class HeroAccountCard extends StatelessWidget {
@@ -47,7 +48,7 @@ class HeroAccountCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    phoneNumber,
+                    PhoneFormatter.mask(phoneNumber),
                     style: typography.title.copyWith(
                       color: AppColors.onPrimary,
                     ),
