@@ -45,10 +45,10 @@ app.*.map.json
 /android/app/release
 
 
-# Environment & Secrets
-.env
-.env.*
-.env.example
+# # Environment & Secrets
+# .env
+# .env.*
+# .env.example
 
 # Android
 android/local.properties
