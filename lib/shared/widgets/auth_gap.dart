@@ -5,6 +5,8 @@ import '../../core/utils/responsive.dart';
 
 class AuthGap extends StatelessWidget {
   const AuthGap.logoToTitle({super.key}) : height = AuthSpacing.logoToTitle;
+  const AuthGap.illustrationToTitle({super.key})
+      : height = AuthSpacing.illustrationToTitle;
   const AuthGap.titleToContent({super.key})
       : height = AuthSpacing.titleToContent;
   const AuthGap.labelToField({super.key}) : height = AuthSpacing.labelToField;

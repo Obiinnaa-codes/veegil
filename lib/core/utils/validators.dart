@@ -20,13 +20,17 @@ abstract final class Validators {
     return null;
   }
 
-  static String? password(String? value) {
+  static String? password(String? value, {int? maxLength}) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
 
     if (value.length < AppConstants.minPasswordLength) {
       return 'Password must be at least ${AppConstants.minPasswordLength} characters';
+    }
+
+    if (maxLength != null && value.length > maxLength) {
+      return 'Password must be 8–128 characters';
     }
 
     return null;

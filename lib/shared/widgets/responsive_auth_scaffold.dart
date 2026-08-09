@@ -3,24 +3,24 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_color_extension.dart';
 import '../../core/utils/responsive.dart';
-import 'app_logo.dart';
+import '../../features/auth/presentation/widgets/auth_illustration_carousel.dart';
 import 'auth_gap.dart';
 
 class ResponsiveAuthScaffold extends StatelessWidget {
   const ResponsiveAuthScaffold({
     super.key,
     required this.child,
-    this.showLogo = true,
+    this.showIllustration = true,
   });
 
   final Widget child;
-  final bool showLogo;
+  final bool showIllustration;
 
   @override
   Widget build(BuildContext context) {
     final isWide = Responsive.isTablet(context);
     final horizontalPadding = Responsive.authHorizontalPadding();
-    final topSpacing = Responsive.topSpacingBeforeLogo(context);
+    final topSpacing = Responsive.topSpacingBeforeIllustration(context);
     final bottomSpacing = Responsive.bottomCtaPadding(context);
 
     final colors = context.appColors;
@@ -74,9 +74,9 @@ class ResponsiveAuthScaffold extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           SizedBox(height: topSpacing),
-                          if (showLogo) ...[
-                            const Center(child: AppLogo()),
-                            const AuthGap.logoToTitle(),
+                          if (showIllustration) ...[
+                            const AuthIllustrationCarousel(),
+                            const AuthGap.illustrationToTitle(),
                           ],
                           child,
                           SizedBox(height: bottomSpacing),

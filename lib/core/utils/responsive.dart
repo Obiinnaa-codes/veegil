@@ -29,6 +29,25 @@ abstract final class Responsive {
     return (AuthSpacing.topBeforeLogoMin * ratio).clamp(48.0, AuthSpacing.topBeforeLogoMax);
   }
 
+  static double topSpacingBeforeIllustration(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+
+    if (height >= shortScreenHeight) {
+      return AuthSpacing.topBeforeIllustrationMax;
+    }
+
+    final ratio = (height / shortScreenHeight).clamp(0.5, 1.0);
+    return (AuthSpacing.topBeforeIllustrationMin * ratio)
+        .clamp(AuthSpacing.topBeforeIllustrationMin, AuthSpacing.topBeforeIllustrationMax);
+  }
+
+  static double authIllustrationHeight(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+    if (height < shortScreenHeight) return 140;
+    if (height < 800) return 180;
+    return 220;
+  }
+
   static double bottomCtaPadding(BuildContext context) {
     final height = MediaQuery.sizeOf(context).height;
 

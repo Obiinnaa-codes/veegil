@@ -24,6 +24,7 @@ class AppTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.focusNode,
+    this.guidance,
   });
 
   final String label;
@@ -39,6 +40,7 @@ class AppTextField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final FocusNode? focusNode;
+  final Widget? guidance;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -101,7 +103,12 @@ class _AppTextFieldState extends State<AppTextField> {
             widget.label,
             style: typography.label.copyWith(color: colors.text),
           ),
-          const SizedBox(height: AuthSpacing.labelToField),
+          if (widget.guidance != null) ...[
+            const SizedBox(height: AuthSpacing.labelToGuidance),
+            widget.guidance!,
+            const SizedBox(height: AuthSpacing.guidanceToField),
+          ] else
+            const SizedBox(height: AuthSpacing.labelToField),
           Container(
             height: AppConstants.textFieldHeight,
             decoration: BoxDecoration(

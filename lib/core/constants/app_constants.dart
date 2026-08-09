@@ -13,4 +13,5 @@ abstract final class AppConstants {
   static const int minPhoneLength = 10;
   static const int maxPhoneLength = 15;
   static const int minPasswordLength = 8;
+  static const int maxPasswordLength = 128;
 }

@@ -7,7 +7,6 @@ import '../../../../core/constants/route_paths.dart';
 import '../../../../shared/widgets/app_text_field.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
-import '../../../../shared/widgets/auth_text_link.dart';
 import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/responsive_auth_scaffold.dart';
 import '../controllers/login_controller.dart';
@@ -38,12 +37,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _showForgotPasswordMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Password recovery is coming soon')),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     ref.listen(loginControllerProvider, (previous, next) {
@@ -62,7 +55,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const AuthHeader(title: 'Welcome Back'),
+          const AuthHeader(
+            title: 'Welcome back',
+            subtitle: 'Sign in to your account',
+          ),
           const AuthGap.titleToContent(),
           AppTextField(
             label: 'Phone Number',
@@ -91,15 +87,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             onChanged: controller.onPasswordChanged,
             onSubmitted: (_) => _handleLogin(),
           ),
-          const AuthGap.fieldToSupporting(),
-          AuthTextLink(
-            label: 'Forgot Password?',
-            alignment: Alignment.centerRight,
-            onTap: _showForgotPasswordMessage,
-          ),
           const AuthGap.fieldToPrimaryButton(),
           LoadingButton(
-            label: 'Log In',
+            label: 'Sign In',
             loadingLabel: 'Signing In...',
             isLoading: state.isLoading,
             isEnabled: state.isFormValid,

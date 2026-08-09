@@ -3,8 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/constants/route_paths.dart';
+import '../../../../core/utils/validators.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/auth_field_hint.dart';
 import '../../../../shared/widgets/auth_gap.dart';
 import '../../../../shared/widgets/auth_header.dart';
 import '../../../../shared/widgets/loading_button.dart';
@@ -53,12 +56,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     final state = ref.watch(signUpControllerProvider);
     final controller = ref.read(signUpControllerProvider.notifier);
+    final isPasswordValid = state.password.isNotEmpty &&
+        Validators.password(
+              state.password,
+              maxLength: AppConstants.maxPasswordLength,
+            ) ==
+            null;
+    final doPasswordsMatch = state.confirmPassword.isNotEmpty &&
+        Validators.confirmPassword(state.confirmPassword, state.password) ==
+            null;
 
     return ResponsiveAuthScaffold(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const AuthHeader(title: 'Create Account'),
+          const AuthHeader(
+            title: 'Create your account',
+            subtitle: 'Get started with simple, secure banking.',
+          ),
           const AuthGap.titleToContent(),
           AppTextField(
             label: 'Phone Number',
@@ -83,9 +98,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             showVisibilityToggle: true,
             textInputAction: TextInputAction.next,
             autofillHints: const [AutofillHints.newPassword],
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(AppConstants.maxPasswordLength),
+            ],
             focusNode: _passwordFocusNode,
             onChanged: controller.onPasswordChanged,
             onSubmitted: (_) => _confirmPasswordFocusNode.requestFocus(),
+            guidance: AuthFieldHint(
+              text: 'Password must be 8–128 characters',
+              isValid: isPasswordValid,
+            ),
           ),
           const AuthGap.fieldToNextLabel(),
           AppTextField(
@@ -100,10 +122,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             focusNode: _confirmPasswordFocusNode,
             onChanged: controller.onConfirmPasswordChanged,
             onSubmitted: (_) => _handleSignUp(),
+            guidance: AuthFieldHint(
+              text: 'Passwords must match',
+              validText: 'Passwords match',
+              isValid: doPasswordsMatch,
+              inactiveIcon: Icons.password_outlined,
+            ),
           ),
           const AuthGap.fieldToPrimaryButton(),
           LoadingButton(
-            label: 'Create Account',
+            label: 'Sign Up',
             loadingLabel: 'Creating Account...',
             isLoading: state.isLoading,
             isEnabled: state.isFormValid,

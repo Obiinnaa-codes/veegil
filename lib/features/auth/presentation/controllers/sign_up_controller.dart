@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/network/api_client.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/utils/validators.dart';
@@ -29,7 +30,11 @@ class SignUpState {
 
   bool get isFormValid =>
       Validators.phone(phoneNumber) == null &&
-      Validators.password(password) == null &&
+      Validators.password(
+            password,
+            maxLength: AppConstants.maxPasswordLength,
+          ) ==
+          null &&
       Validators.confirmPassword(confirmPassword, password) == null;
 
   SignUpState copyWith({
@@ -89,7 +94,10 @@ class SignUpController extends Notifier<SignUpState> {
 
   bool _validate() {
     final phoneError = Validators.phone(state.phoneNumber);
-    final passwordError = Validators.password(state.password);
+    final passwordError = Validators.password(
+      state.password,
+      maxLength: AppConstants.maxPasswordLength,
+    );
     final confirmPasswordError = Validators.confirmPassword(
       state.confirmPassword,
       state.password,
