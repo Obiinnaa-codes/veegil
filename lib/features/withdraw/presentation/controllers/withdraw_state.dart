@@ -13,6 +13,7 @@ class WithdrawState {
     this.errorMessage,
     this.withdrawnAmount,
     this.selectedQuickAmount,
+    this.isMaxSelected = false,
   });
 
   final String amountDisplay;
@@ -21,6 +22,7 @@ class WithdrawState {
   final String? errorMessage;
   final int? withdrawnAmount;
   final int? selectedQuickAmount;
+  final bool isMaxSelected;
 
   bool get isLoading => status == WithdrawStatus.loading;
 
@@ -31,6 +33,7 @@ class WithdrawState {
     String? errorMessage,
     int? withdrawnAmount,
     int? selectedQuickAmount,
+    bool? isMaxSelected,
     bool clearAmountError = false,
     bool clearErrorMessage = false,
     bool clearWithdrawnAmount = false,
@@ -48,6 +51,7 @@ class WithdrawState {
       selectedQuickAmount: clearSelectedQuickAmount
           ? null
           : (selectedQuickAmount ?? this.selectedQuickAmount),
+      isMaxSelected: isMaxSelected ?? this.isMaxSelected,
     );
   }
 

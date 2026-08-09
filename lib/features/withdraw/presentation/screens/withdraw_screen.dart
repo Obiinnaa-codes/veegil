@@ -16,6 +16,7 @@ import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/transaction_confirmation_sheet.dart';
 import '../../../../shared/widgets/transaction_receipt_screen.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/models/transaction_receipt_mode.dart';
 import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
 import '../controllers/withdraw_controller.dart';
 import '../controllers/withdraw_state.dart';
@@ -84,6 +85,7 @@ class _WithdrawScreenState extends ConsumerState<WithdrawScreen> {
     showTransactionReceipt(
       context: context,
       transaction: transaction,
+      mode: TransactionReceiptMode.success,
       onDone: () {
         if (mounted) {
           context.pop();
@@ -171,7 +173,9 @@ class _WithdrawScreenState extends ConsumerState<WithdrawScreen> {
                           const SizedBox(height: AppSpacing.md),
                           WithdrawQuickAmountChips(
                             selectedAmount: state.selectedQuickAmount,
+                            isMaxSelected: state.isMaxSelected,
                             onSelected: controller.setQuickAmount,
+                            onMaxPressed: controller.setMaxAmount,
                           ),
                           const AuthGap.fieldToPrimaryButton(),
                           LoadingButton(

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/transaction.dart';
+import '../models/transaction_receipt_mode.dart';
 import '../utils/transaction_colors.dart';
 import '../utils/transaction_receipt_image_theme.dart';
 import 'transaction_receipt_content.dart';
@@ -61,6 +62,7 @@ class TransactionReceiptImage extends StatelessWidget {
             TransactionReceiptSuccessSection(
               transaction: transaction,
               accentColor: accentColor,
+              mode: TransactionReceiptMode.detail,
               titleStyle: typography.title.copyWith(color: theme.primaryText),
               heroAmountStyle: typography.display.copyWith(
                 color: accentColor,

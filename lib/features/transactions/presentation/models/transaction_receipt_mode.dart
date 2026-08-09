@@ -1,0 +1,4 @@
+enum TransactionReceiptMode {
+  success,
+  detail,
+}

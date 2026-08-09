@@ -11,12 +11,16 @@ class QuickAmountChips extends StatelessWidget {
     required this.selectedAmount,
     required this.onSelected,
     this.accentColor = AppColors.primary,
+    this.onMaxPressed,
+    this.isMaxSelected = false,
   });
 
   final List<int> amounts;
   final int? selectedAmount;
   final ValueChanged<int> onSelected;
   final Color accentColor;
+  final VoidCallback? onMaxPressed;
+  final bool isMaxSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -26,26 +30,43 @@ class QuickAmountChips extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
-        children: amounts.map((amount) {
-          final isSelected = selectedAmount == amount;
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(CurrencyFormatter.format(amount.toDouble())),
-              selected: isSelected,
+        children: [
+          ...amounts.map((amount) {
+            final isSelected = !isMaxSelected && selectedAmount == amount;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: FilterChip(
+                label: Text(CurrencyFormatter.format(amount.toDouble())),
+                selected: isSelected,
+                showCheckmark: false,
+                selectedColor: accentColor,
+                backgroundColor: colors.surfaceContainerHigh,
+                labelStyle: TextStyle(
+                  color: isSelected ? colorScheme.onPrimary : colors.text,
+                ),
+                side: BorderSide(
+                  color: isSelected ? accentColor : colors.outlineVariant,
+                ),
+                onSelected: (_) => onSelected(amount),
+              ),
+            );
+          }),
+          if (onMaxPressed != null)
+            FilterChip(
+              label: const Text('Max'),
+              selected: isMaxSelected,
               showCheckmark: false,
               selectedColor: accentColor,
               backgroundColor: colors.surfaceContainerHigh,
               labelStyle: TextStyle(
-                color: isSelected ? colorScheme.onPrimary : colors.text,
+                color: isMaxSelected ? colorScheme.onPrimary : colors.text,
               ),
               side: BorderSide(
-                color: isSelected ? accentColor : colors.outlineVariant,
+                color: isMaxSelected ? accentColor : colors.outlineVariant,
               ),
-              onSelected: (_) => onSelected(amount),
+              onSelected: (_) => onMaxPressed!(),
             ),
-          );
-        }).toList(),
+        ],
       ),
     );
   }

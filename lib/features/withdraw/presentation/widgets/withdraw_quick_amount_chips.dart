@@ -8,12 +8,16 @@ class WithdrawQuickAmountChips extends StatelessWidget {
     super.key,
     required this.selectedAmount,
     required this.onSelected,
+    required this.onMaxPressed,
+    this.isMaxSelected = false,
   });
 
   static const amounts = [500, 1000, 5000, 10000];
 
   final int? selectedAmount;
   final ValueChanged<int> onSelected;
+  final VoidCallback onMaxPressed;
+  final bool isMaxSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +26,8 @@ class WithdrawQuickAmountChips extends StatelessWidget {
       selectedAmount: selectedAmount,
       onSelected: onSelected,
       accentColor: AppColors.transactionWithdraw,
+      onMaxPressed: onMaxPressed,
+      isMaxSelected: isMaxSelected,
     );
   }
 }

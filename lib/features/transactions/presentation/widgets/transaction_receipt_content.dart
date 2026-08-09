@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../core/theme/account_spacing.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../domain/entities/transaction.dart';
+import '../models/transaction_receipt_mode.dart';
 import '../utils/transaction_receipt_formatters.dart'
     show TransactionReceiptDetailRow, TransactionReceiptFormatters;
+import 'transaction_type_icon.dart';
 
 class TransactionReceiptSuccessSection extends StatelessWidget {
   const TransactionReceiptSuccessSection({
@@ -16,10 +17,10 @@ class TransactionReceiptSuccessSection extends StatelessWidget {
     required this.titleStyle,
     required this.heroAmountStyle,
     required this.descriptionStyle,
+    this.mode = TransactionReceiptMode.success,
     this.iconScaleAnimation,
     this.iconFadeAnimation,
     this.successBackgroundColor,
-    this.successIconColor,
     this.compact = false,
   });
 
@@ -28,28 +29,22 @@ class TransactionReceiptSuccessSection extends StatelessWidget {
   final TextStyle titleStyle;
   final TextStyle heroAmountStyle;
   final TextStyle descriptionStyle;
+  final TransactionReceiptMode mode;
   final Animation<double>? iconScaleAnimation;
   final Animation<double>? iconFadeAnimation;
   final Color? successBackgroundColor;
-  final Color? successIconColor;
   final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final iconSize = compact ? 64.0 : 80.0;
-    final checkIconSize = compact ? 36.0 : 44.0;
-    final checkIcon = Container(
-      width: iconSize,
-      height: iconSize,
-      decoration: BoxDecoration(
-        color: (successBackgroundColor ?? AppColors.success.withValues(alpha: 0.12)),
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        Icons.check_rounded,
-        color: successIconColor ?? AppColors.success,
-        size: checkIconSize,
-      ),
+    final typeIconSize = compact ? 40.0 : 48.0;
+
+    Widget heroIcon = TransactionTypeIcon.forTransaction(
+      transaction: transaction,
+      color: accentColor,
+      size: iconSize,
+      iconSize: typeIconSize,
     );
 
     final animatedIcon = iconScaleAnimation != null && iconFadeAnimation != null
@@ -57,17 +52,20 @@ class TransactionReceiptSuccessSection extends StatelessWidget {
             opacity: iconFadeAnimation!,
             child: ScaleTransition(
               scale: iconScaleAnimation!,
-              child: checkIcon,
+              child: heroIcon,
             ),
           )
-        : checkIcon;
+        : heroIcon;
 
     return Column(
       children: [
         animatedIcon,
         SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),
         Text(
-          TransactionReceiptFormatters.titleForCategory(transaction.category),
+          TransactionReceiptFormatters.titleForCategory(
+            transaction.category,
+            mode: mode,
+          ),
           style: titleStyle,
           textAlign: TextAlign.center,
         ),
@@ -81,6 +79,7 @@ class TransactionReceiptSuccessSection extends StatelessWidget {
         Text(
           TransactionReceiptFormatters.descriptionForCategory(
             transaction.category,
+            mode: mode,
           ),
           style: descriptionStyle,
           textAlign: TextAlign.center,

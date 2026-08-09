@@ -7,6 +7,7 @@ import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
 import '../../core/constants/app_constants.dart';
 import '../../features/transactions/domain/entities/transaction.dart';
+import '../../features/transactions/presentation/models/transaction_receipt_mode.dart';
 import '../../features/transactions/presentation/utils/transaction_colors.dart';
 import '../../features/transactions/presentation/utils/transaction_receipt_share.dart';
 import '../../features/transactions/presentation/widgets/transaction_receipt_content.dart';
@@ -16,6 +17,7 @@ Future<void> showTransactionReceipt({
   required BuildContext context,
   required Transaction transaction,
   required VoidCallback onDone,
+  TransactionReceiptMode mode = TransactionReceiptMode.success,
 }) {
   return Navigator.of(context).push<void>(
     MaterialPageRoute<void>(
@@ -23,6 +25,7 @@ Future<void> showTransactionReceipt({
       builder: (screenContext) {
         return TransactionReceiptScreen(
           transaction: transaction,
+          mode: mode,
           onClose: () {
             Navigator.of(screenContext).pop();
             WidgetsBinding.instance.addPostFrameCallback((_) => onDone());
@@ -38,10 +41,12 @@ class TransactionReceiptScreen extends StatefulWidget {
     super.key,
     required this.transaction,
     required this.onClose,
+    this.mode = TransactionReceiptMode.success,
   });
 
   final Transaction transaction;
   final VoidCallback onClose;
+  final TransactionReceiptMode mode;
 
   @override
   State<TransactionReceiptScreen> createState() =>
@@ -51,16 +56,23 @@ class TransactionReceiptScreen extends StatefulWidget {
 class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey _shareButtonKey = GlobalKey();
-  late final AnimationController _controller;
-  late final Animation<double> _iconScaleAnimation;
-  late final Animation<double> _iconFadeAnimation;
-  late final Animation<Offset> _contentSlideAnimation;
-  late final Animation<double> _contentFadeAnimation;
+  AnimationController? _controller;
+  Animation<double>? _iconScaleAnimation;
+  Animation<double>? _iconFadeAnimation;
+  Animation<Offset>? _contentSlideAnimation;
+  Animation<double>? _contentFadeAnimation;
   bool _isSharing = false;
+
+  bool get _isSuccessMode => widget.mode == TransactionReceiptMode.success;
+
+  String get _doneLabel =>
+      _isSuccessMode ? 'Done' : 'Close';
 
   @override
   void initState() {
     super.initState();
+    if (!_isSuccessMode) return;
+
     final motion = AppMotionExtension.expressive;
     _controller = AnimationController(
       vsync: this,
@@ -68,11 +80,11 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     );
 
     _iconScaleAnimation = CurvedAnimation(
-      parent: _controller,
+      parent: _controller!,
       curve: Curves.easeOutBack,
     );
     _iconFadeAnimation = CurvedAnimation(
-      parent: _controller,
+      parent: _controller!,
       curve: const Interval(0, 0.6, curve: Curves.easeOut),
     );
     _contentSlideAnimation = Tween<Offset>(
@@ -80,21 +92,21 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
-        parent: _controller,
+        parent: _controller!,
         curve: const Interval(0.2, 1, curve: Curves.easeOutCubic),
       ),
     );
     _contentFadeAnimation = CurvedAnimation(
-      parent: _controller,
+      parent: _controller!,
       curve: const Interval(0.2, 1, curve: Curves.easeOut),
     );
 
-    _controller.forward();
+    _controller!.forward();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 
@@ -122,6 +134,59 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     }
   }
 
+  Widget _buildBodyContent({
+    required BuildContext context,
+    required Transaction transaction,
+    required Color accentColor,
+    required TextStyle titleStyle,
+    required TextStyle heroAmountStyle,
+    required TextStyle descriptionStyle,
+    required TextStyle labelStyle,
+    required TextStyle valueStyle,
+    required Color backgroundColor,
+    required Color borderColor,
+    required Color dividerColor,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TransactionReceiptSuccessSection(
+          transaction: transaction,
+          accentColor: accentColor,
+          mode: widget.mode,
+          compact: true,
+          titleStyle: titleStyle,
+          heroAmountStyle: heroAmountStyle,
+          descriptionStyle: descriptionStyle,
+          iconScaleAnimation: _iconScaleAnimation,
+          iconFadeAnimation: _iconFadeAnimation,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Divider(
+          height: 1,
+          thickness: 1,
+          color: dividerColor,
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          'Transaction Details',
+          style: titleStyle,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        TransactionReceiptDetailsCard(
+          transaction: transaction,
+          compact: true,
+          backgroundColor: backgroundColor,
+          borderColor: borderColor,
+          dividerColor: dividerColor,
+          labelStyle: labelStyle,
+          valueStyle: valueStyle,
+          padding: const EdgeInsets.all(AppSpacing.md),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -129,6 +194,46 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     final transaction = widget.transaction;
     final accentColor =
         TransactionColors.forCategory(context, transaction.category);
+
+    final bodyContent = _buildBodyContent(
+      context: context,
+      transaction: transaction,
+      accentColor: accentColor,
+      titleStyle: typography.title,
+      heroAmountStyle: typography.display.copyWith(
+        color: accentColor,
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+      ),
+      descriptionStyle: typography.body.copyWith(
+        color: colors.subtitle,
+      ),
+      labelStyle: typography.caption,
+      valueStyle: typography.body.copyWith(
+        fontWeight: FontWeight.w500,
+      ),
+      backgroundColor: colors.surfaceContainerHigh,
+      borderColor: colors.outlineVariant,
+      dividerColor: colors.outlineVariant,
+    );
+
+    final scrollableBody = SingleChildScrollView(
+      padding: const EdgeInsets.fromLTRB(
+        AccountSpacing.pagePadding,
+        AppSpacing.md,
+        AccountSpacing.pagePadding,
+        AppSpacing.sm,
+      ),
+      child: _isSuccessMode && _contentFadeAnimation != null
+          ? FadeTransition(
+              opacity: _contentFadeAnimation!,
+              child: SlideTransition(
+                position: _contentSlideAnimation!,
+                child: bodyContent,
+              ),
+            )
+          : bodyContent,
+    );
 
     return PopScope(
       canPop: false,
@@ -143,69 +248,7 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
         ),
         body: Column(
           children: [
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AccountSpacing.pagePadding,
-                  AppSpacing.md,
-                  AccountSpacing.pagePadding,
-                  AppSpacing.sm,
-                ),
-                child: FadeTransition(
-                  opacity: _contentFadeAnimation,
-                  child: SlideTransition(
-                    position: _contentSlideAnimation,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        TransactionReceiptSuccessSection(
-                          transaction: transaction,
-                          accentColor: accentColor,
-                          compact: true,
-                          titleStyle: typography.title,
-                          heroAmountStyle: typography.display.copyWith(
-                            color: accentColor,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          descriptionStyle: typography.body.copyWith(
-                            color: colors.subtitle,
-                          ),
-                          iconScaleAnimation: _iconScaleAnimation,
-                          iconFadeAnimation: _iconFadeAnimation,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Divider(
-                          height: 1,
-                          thickness: 1,
-                          color: colors.outlineVariant,
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Transaction Details',
-                          style: typography.title,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Expanded(
-                          child: TransactionReceiptDetailsCard(
-                            transaction: transaction,
-                            compact: true,
-                            backgroundColor: colors.surfaceContainerHigh,
-                            borderColor: colors.outlineVariant,
-                            dividerColor: colors.outlineVariant,
-                            labelStyle: typography.caption,
-                            valueStyle: typography.body.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            padding: const EdgeInsets.all(AppSpacing.md),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
+            Expanded(child: scrollableBody),
             SafeArea(
               top: false,
               child: Container(
@@ -236,7 +279,7 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: _ReceiptActionButton(
-                        label: 'Done',
+                        label: _doneLabel,
                         onPressed: widget.onClose,
                       ),
                     ),

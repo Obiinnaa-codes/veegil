@@ -6,6 +6,8 @@ import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
+import '../../../../core/utils/phone_formatter.dart';
+import '../../../../core/utils/validators.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/transaction_category.dart';
 import '../../domain/entities/transaction_direction.dart';
@@ -81,11 +83,16 @@ class TransactionItem extends StatelessWidget {
                   '${DateFormatter.format(transaction.created)} · ${DateFormatter.formatTime(transaction.created)}',
                   style: typography.caption,
                 ),
-                if (!compact && counterpartyLabel != null) ...[
+                if (counterpartyLabel != null) ...[
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     counterpartyLabel,
-                    style: typography.caption.copyWith(color: colors.text),
+                    style: typography.caption.copyWith(
+                      color: colors.text,
+                      fontSize: compact ? 12 : null,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ],
@@ -100,8 +107,8 @@ class TransactionItem extends StatelessWidget {
     switch (category) {
       case TransactionCategory.deposit:
       case TransactionCategory.withdraw:
-        return true;
       case TransactionCategory.transfer:
+        return true;
       case TransactionCategory.unknown:
         return false;
     }
@@ -116,13 +123,23 @@ class TransactionItem extends StatelessWidget {
     final counterparty = transaction.counterparty;
     if (counterparty == null || counterparty.isEmpty) return null;
 
+    final display = _formatCounterparty(counterparty);
+
     switch (transaction.direction) {
       case TransactionDirection.debit:
-        return 'To $counterparty';
+        return 'To $display';
       case TransactionDirection.credit:
-        return 'From $counterparty';
+        return 'From $display';
       case TransactionDirection.unknown:
-        return counterparty;
+        return display;
     }
+  }
+
+  String _formatCounterparty(String counterparty) {
+    final trimmed = counterparty.trim();
+    if (Validators.phone(trimmed) == null) {
+      return PhoneFormatter.mask(trimmed);
+    }
+    return counterparty;
   }
 }

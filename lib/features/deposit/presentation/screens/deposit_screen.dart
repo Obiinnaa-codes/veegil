@@ -12,6 +12,7 @@ import '../../../../shared/widgets/inline_error_view.dart';
 import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/transaction_receipt_screen.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/models/transaction_receipt_mode.dart';
 import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
 import '../controllers/deposit_controller.dart';
 import '../controllers/deposit_state.dart';
@@ -52,6 +53,7 @@ class _DepositScreenState extends ConsumerState<DepositScreen> {
     showTransactionReceipt(
       context: context,
       transaction: transaction,
+      mode: TransactionReceiptMode.success,
       onDone: () {
         if (mounted) {
           context.pop();

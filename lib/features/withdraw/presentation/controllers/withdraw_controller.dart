@@ -19,19 +19,6 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
   @override
   Future<WithdrawState> build() async => WithdrawState.initial;
 
-  void onAmountChanged(String value) {
-    final current = state.requireValue;
-    state = AsyncData(
-      current.copyWith(
-        amountDisplay: value,
-        clearAmountError: true,
-        clearSelectedQuickAmount: true,
-        status: WithdrawStatus.idle,
-        clearErrorMessage: true,
-      ),
-    );
-  }
-
   void setQuickAmount(int amount) {
     final current = state.requireValue;
     state = AsyncData(
@@ -41,6 +28,40 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
         clearAmountError: true,
         status: WithdrawStatus.idle,
         clearErrorMessage: true,
+        isMaxSelected: false,
+      ),
+    );
+  }
+
+  void setMaxAmount() {
+    final current = state.requireValue;
+    final balance =
+        ref.read(dashboardControllerProvider).valueOrNull?.balance;
+    if (balance == null || balance <= 0) return;
+
+    final maxAmount = balance.floor();
+    state = AsyncData(
+      current.copyWith(
+        amountDisplay: AmountParser.formatDisplayFromInt(maxAmount),
+        clearSelectedQuickAmount: true,
+        clearAmountError: true,
+        status: WithdrawStatus.idle,
+        clearErrorMessage: true,
+        isMaxSelected: true,
+      ),
+    );
+  }
+
+  void onAmountChanged(String value) {
+    final current = state.requireValue;
+    state = AsyncData(
+      current.copyWith(
+        amountDisplay: value,
+        clearAmountError: true,
+        clearSelectedQuickAmount: true,
+        status: WithdrawStatus.idle,
+        clearErrorMessage: true,
+        isMaxSelected: false,
       ),
     );
   }
@@ -109,6 +130,7 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
 
     try {
       await ref.read(withdrawRepositoryProvider).withdraw(amount);
+      await refreshAccountData(ref);
 
       state = AsyncData(
         current.copyWith(
@@ -117,8 +139,6 @@ class WithdrawController extends AutoDisposeAsyncNotifier<WithdrawState> {
           clearErrorMessage: true,
         ),
       );
-
-      await refreshAccountData(ref);
     } catch (error) {
       if (ApiErrorMapper.isUnauthorized(error)) {
         await ref.read(authControllerProvider.notifier).logout();

@@ -164,6 +164,7 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
             amount: amount,
             idempotencyKey: idempotencyKey,
           );
+      await refreshAccountData(ref);
 
       state = AsyncData(
         current.copyWith(
@@ -174,8 +175,6 @@ class TransferController extends AutoDisposeAsyncNotifier<TransferState> {
           clearIdempotencyKey: true,
         ),
       );
-
-      await refreshAccountData(ref);
     } catch (error) {
       if (ApiErrorMapper.isUnauthorized(error)) {
         await ref.read(authControllerProvider.notifier).logout();

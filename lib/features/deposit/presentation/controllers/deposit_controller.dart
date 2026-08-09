@@ -69,6 +69,7 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
 
     try {
       await ref.read(depositRepositoryProvider).deposit(amount!);
+      await refreshAccountData(ref);
 
       state = AsyncData(
         current.copyWith(
@@ -77,8 +78,6 @@ class DepositController extends AutoDisposeAsyncNotifier<DepositState> {
           clearErrorMessage: true,
         ),
       );
-
-      await refreshAccountData(ref);
     } catch (error) {
       if (ApiErrorMapper.isUnauthorized(error)) {
         await ref.read(authControllerProvider.notifier).logout();

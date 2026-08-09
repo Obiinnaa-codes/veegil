@@ -1,8 +1,11 @@
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/transaction_category.dart';
 import '../../domain/entities/transaction_direction.dart';
+import '../models/transaction_receipt_mode.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+import '../../../../core/utils/phone_formatter.dart';
+import '../../../../core/utils/validators.dart';
 
 class TransactionReceiptDetailRow {
   const TransactionReceiptDetailRow({
@@ -17,7 +20,14 @@ class TransactionReceiptDetailRow {
 }
 
 abstract final class TransactionReceiptFormatters {
-  static String titleForCategory(TransactionCategory category) {
+  static String titleForCategory(
+    TransactionCategory category, {
+    TransactionReceiptMode mode = TransactionReceiptMode.success,
+  }) {
+    if (mode == TransactionReceiptMode.detail) {
+      return typeLabelForCategory(category);
+    }
+
     switch (category) {
       case TransactionCategory.deposit:
         return 'Deposit Successful';
@@ -30,7 +40,23 @@ abstract final class TransactionReceiptFormatters {
     }
   }
 
-  static String descriptionForCategory(TransactionCategory category) {
+  static String descriptionForCategory(
+    TransactionCategory category, {
+    TransactionReceiptMode mode = TransactionReceiptMode.success,
+  }) {
+    if (mode == TransactionReceiptMode.detail) {
+      switch (category) {
+        case TransactionCategory.deposit:
+          return 'Money added to your account.';
+        case TransactionCategory.withdraw:
+          return 'Money withdrawn from your account.';
+        case TransactionCategory.transfer:
+          return 'Money sent to another account.';
+        case TransactionCategory.unknown:
+          return 'Transaction details below.';
+      }
+    }
+
     switch (category) {
       case TransactionCategory.deposit:
         return 'Money has been added to your account.';
@@ -107,6 +133,13 @@ abstract final class TransactionReceiptFormatters {
     return note;
   }
 
+  static String displayCounterparty(String counterparty) {
+    if (Validators.phone(counterparty.trim()) == null) {
+      return PhoneFormatter.mask(counterparty.trim());
+    }
+    return counterparty;
+  }
+
   static List<TransactionReceiptDetailRow> detailRows(Transaction transaction) {
     final rows = <TransactionReceiptDetailRow>[
       TransactionReceiptDetailRow(
@@ -123,7 +156,7 @@ abstract final class TransactionReceiptFormatters {
       rows.add(
         TransactionReceiptDetailRow(
           label: counterpartyDirection,
-          value: counterparty,
+          value: displayCounterparty(counterparty),
         ),
       );
     }

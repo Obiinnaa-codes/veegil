@@ -65,6 +65,16 @@ Transaction? _findMatchingTransaction({
       continue;
     }
 
+    final currentHasId = transaction.id.isNotEmpty;
+    final bestHasId = bestMatch.id.isNotEmpty;
+    if (currentHasId && !bestHasId) {
+      bestMatch = transaction;
+      continue;
+    }
+    if (!currentHasId && bestHasId) {
+      continue;
+    }
+
     final currentCreated = transaction.created;
     final bestCreated = bestMatch.created;
     if (currentCreated != null &&

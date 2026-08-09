@@ -18,6 +18,7 @@ import '../../../../shared/widgets/loading_button.dart';
 import '../../../../shared/widgets/transaction_confirmation_sheet.dart';
 import '../../../../shared/widgets/transaction_receipt_screen.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/models/transaction_receipt_mode.dart';
 import '../../../transactions/presentation/utils/transaction_receipt_resolver.dart';
 import '../controllers/transfer_controller.dart';
 import '../controllers/transfer_state.dart';
@@ -94,6 +95,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen> {
     showTransactionReceipt(
       context: context,
       transaction: transaction,
+      mode: TransactionReceiptMode.success,
       onDone: () {
         if (mounted) {
           context.pop();
