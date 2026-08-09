@@ -43,11 +43,6 @@ class DashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         centerTitle: false,
         automaticallyImplyLeading: false,
-        leading: IconButton(
-          icon: const Icon(Icons.person_outline),
-          tooltip: 'Profile',
-          onPressed: () => context.go(RoutePaths.profile),
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),

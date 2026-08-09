@@ -14,6 +14,9 @@ final appVersionProvider = FutureProvider<String>((ref) async {
 /// Placeholder for future notifications API integration.
 final hasUnreadNotificationsProvider = Provider<bool>((ref) => false);
 
+/// Toggles visibility of phone/account numbers on the profile screen.
+final sensitiveAccountInfoVisibleProvider = StateProvider<bool>((ref) => false);
+
 class ProfileController {
   ProfileController(this._ref);
 

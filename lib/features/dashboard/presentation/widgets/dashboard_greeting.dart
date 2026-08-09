@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/utils/phone_formatter.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../profile/presentation/widgets/revealable_account_value.dart';
 
 class DashboardGreeting extends StatelessWidget {
   const DashboardGreeting({
@@ -18,16 +18,10 @@ class DashboardGreeting extends StatelessWidget {
     return 'Good Evening';
   }
 
-  String _subtitle() {
-    if (phoneNumber != null && phoneNumber!.isNotEmpty) {
-      return PhoneFormatter.mask(phoneNumber!);
-    }
-    return 'Welcome Back';
-  }
-
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
+    final hasPhone = phoneNumber != null && phoneNumber!.isNotEmpty;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,10 +31,16 @@ class DashboardGreeting extends StatelessWidget {
           style: typography.heading,
         ),
         const SizedBox(height: 4),
-        Text(
-          _subtitle(),
-          style: typography.caption,
-        ),
+        if (hasPhone)
+          RevealableAccountValue(
+            value: phoneNumber!,
+            style: typography.caption,
+          )
+        else
+          Text(
+            'Welcome Back',
+            style: typography.caption,
+          ),
       ],
     );
   }

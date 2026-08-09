@@ -4,8 +4,8 @@ import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/utils/phone_formatter.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
+import 'revealable_account_value.dart';
 
 class AccountInformationCard extends StatelessWidget {
   const AccountInformationCard({
@@ -20,12 +20,11 @@ class AccountInformationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
-    final rows = <_InfoRowData>[
-      _InfoRowData(
-        label: 'Phone Number',
-        value: PhoneFormatter.mask(phoneNumber),
-      ),
+    final typography = context.typography;
 
+    final rows = <_InfoRowData>[
+      _InfoRowData(label: 'Phone Number', value: phoneNumber),
+      _InfoRowData(label: 'Account Number', value: phoneNumber),
     ];
 
     return AppSurfaceCard(
@@ -33,6 +32,8 @@ class AccountInformationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text('Account Information', style: typography.title),
+          const SizedBox(height: AppSpacing.md),
           for (var i = 0; i < rows.length; i++) ...[
             if (i > 0) ...[
               const SizedBox(height: AppSpacing.md),
@@ -69,8 +70,8 @@ class _InfoRow extends StatelessWidget {
       children: [
         Text(label, style: typography.caption),
         const SizedBox(height: AppSpacing.xs),
-        Text(
-          value,
+        RevealableAccountValue(
+          value: value,
           style: typography.body.copyWith(fontWeight: FontWeight.w500),
         ),
       ],
