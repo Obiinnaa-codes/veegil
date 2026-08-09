@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_surface_card.dart';
 import '../../domain/entities/transaction.dart';
 import '../../domain/entities/transaction_direction.dart';
 import '../utils/transaction_colors.dart';
+import 'transaction_type_icon.dart';
 
 class TransactionItem extends StatelessWidget {
   const TransactionItem({
@@ -27,7 +28,6 @@ class TransactionItem extends StatelessWidget {
     final accentColor = TransactionColors.forCategory(context, transaction.category);
     final categoryLabel =
         TransactionColors.labelForCategory(transaction.category, note: transaction.note);
-    final directionLabel = _directionLabel(transaction.direction);
     final counterpartyLabel = _counterpartyLabel(transaction);
 
     return AppSurfaceCard(
@@ -35,13 +35,9 @@ class TransactionItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 4,
-            height: compact ? 48 : 56,
-            decoration: BoxDecoration(
-              color: accentColor,
-              borderRadius: BorderRadius.circular(2),
-            ),
+          TransactionTypeIcon.forTransaction(
+            transaction: transaction,
+            color: accentColor,
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -66,19 +62,9 @@ class TransactionItem extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: AppSpacing.xs),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        '${DateFormatter.format(transaction.created)} · ${DateFormatter.formatTime(transaction.created)}',
-                        style: typography.caption,
-                      ),
-                    ),
-                    _DirectionBadge(
-                      label: directionLabel,
-                      color: accentColor,
-                    ),
-                  ],
+                Text(
+                  '${DateFormatter.format(transaction.created)} · ${DateFormatter.formatTime(transaction.created)}',
+                  style: typography.caption,
                 ),
                 if (!compact && counterpartyLabel != null) ...[
                   const SizedBox(height: AppSpacing.xs),
@@ -100,17 +86,6 @@ class TransactionItem extends StatelessWidget {
     return '$prefix${CurrencyFormatter.format(transaction.amount)}';
   }
 
-  String _directionLabel(TransactionDirection direction) {
-    switch (direction) {
-      case TransactionDirection.credit:
-        return 'Credit';
-      case TransactionDirection.debit:
-        return 'Debit';
-      case TransactionDirection.unknown:
-        return '—';
-    }
-  }
-
   String? _counterpartyLabel(Transaction transaction) {
     final counterparty = transaction.counterparty;
     if (counterparty == null || counterparty.isEmpty) return null;
@@ -123,35 +98,5 @@ class TransactionItem extends StatelessWidget {
       case TransactionDirection.unknown:
         return counterparty;
     }
-  }
-}
-
-class _DirectionBadge extends StatelessWidget {
-  const _DirectionBadge({
-    required this.label,
-    required this.color,
-  });
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final typography = context.typography;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        label,
-        style: typography.label.copyWith(color: color),
-      ),
-    );
   }
 }

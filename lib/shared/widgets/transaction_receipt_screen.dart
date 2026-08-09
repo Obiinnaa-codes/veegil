@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/account_spacing.dart';
 import '../../core/theme/app_color_extension.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_motion_extension.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
+import '../../core/constants/app_constants.dart';
 import '../../features/transactions/domain/entities/transaction.dart';
-import '../../features/transactions/presentation/utils/transaction_receipt_formatters.dart';
-import '../../features/transactions/presentation/utils/transaction_receipt_share.dart';
 import '../../features/transactions/presentation/utils/transaction_colors.dart';
-import 'app_surface_card.dart';
-import 'primary_button.dart';
+import '../../features/transactions/presentation/utils/transaction_receipt_share.dart';
+import '../../features/transactions/presentation/widgets/transaction_receipt_content.dart';
+import 'veegil_loading_indicator.dart';
 
 Future<void> showTransactionReceipt({
   required BuildContext context,
@@ -51,11 +50,13 @@ class TransactionReceiptScreen extends StatefulWidget {
 
 class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     with SingleTickerProviderStateMixin {
+  final GlobalKey _shareButtonKey = GlobalKey();
   late final AnimationController _controller;
   late final Animation<double> _iconScaleAnimation;
   late final Animation<double> _iconFadeAnimation;
   late final Animation<Offset> _contentSlideAnimation;
   late final Animation<double> _contentFadeAnimation;
+  bool _isSharing = false;
 
   @override
   void initState() {
@@ -97,6 +98,30 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     super.dispose();
   }
 
+  Rect? _sharePositionOrigin() {
+    final box =
+        _shareButtonKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return null;
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
+  Future<void> _handleShareReceipt() async {
+    if (_isSharing) return;
+
+    setState(() => _isSharing = true);
+    try {
+      await TransactionReceiptShare.shareReceipt(
+        context: context,
+        transaction: widget.transaction,
+        sharePositionOrigin: _sharePositionOrigin(),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSharing = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -104,7 +129,6 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
     final transaction = widget.transaction;
     final accentColor =
         TransactionColors.forCategory(context, transaction.category);
-    final detailRows = TransactionReceiptFormatters.detailRows(transaction);
 
     return PopScope(
       canPop: false,
@@ -120,12 +144,12 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
         body: Column(
           children: [
             Expanded(
-              child: SingleChildScrollView(
+              child: Padding(
                 padding: const EdgeInsets.fromLTRB(
                   AccountSpacing.pagePadding,
-                  AppSpacing.lg,
-                  AccountSpacing.pagePadding,
                   AppSpacing.md,
+                  AccountSpacing.pagePadding,
+                  AppSpacing.sm,
                 ),
                 child: FadeTransition(
                   opacity: _contentFadeAnimation,
@@ -134,44 +158,46 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _SuccessSection(
+                        TransactionReceiptSuccessSection(
                           transaction: transaction,
                           accentColor: accentColor,
+                          compact: true,
+                          titleStyle: typography.title,
+                          heroAmountStyle: typography.display.copyWith(
+                            color: accentColor,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          descriptionStyle: typography.body.copyWith(
+                            color: colors.subtitle,
+                          ),
                           iconScaleAnimation: _iconScaleAnimation,
                           iconFadeAnimation: _iconFadeAnimation,
                         ),
-                        const SizedBox(height: AccountSpacing.sectionGap),
+                        const SizedBox(height: AppSpacing.md),
                         Divider(
                           height: 1,
                           thickness: 1,
                           color: colors.outlineVariant,
                         ),
-                        const SizedBox(height: AccountSpacing.sectionGap),
+                        const SizedBox(height: AppSpacing.md),
                         Text(
                           'Transaction Details',
                           style: typography.title,
                         ),
-                        const SizedBox(height: AppSpacing.md),
-                        AppSurfaceCard(
-                          padding: const EdgeInsets.all(
-                            AccountSpacing.cardPadding,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              for (var i = 0; i < detailRows.length; i++) ...[
-                                if (i > 0) ...[
-                                  const SizedBox(height: AppSpacing.md),
-                                  Divider(
-                                    height: 1,
-                                    thickness: 1,
-                                    color: colors.outlineVariant,
-                                  ),
-                                  const SizedBox(height: AppSpacing.md),
-                                ],
-                                _ReceiptDetailRow(row: detailRows[i]),
-                              ],
-                            ],
+                        const SizedBox(height: AppSpacing.sm),
+                        Expanded(
+                          child: TransactionReceiptDetailsCard(
+                            transaction: transaction,
+                            compact: true,
+                            backgroundColor: colors.surfaceContainerHigh,
+                            borderColor: colors.outlineVariant,
+                            dividerColor: colors.outlineVariant,
+                            labelStyle: typography.caption,
+                            valueStyle: typography.body.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                            padding: const EdgeInsets.all(AppSpacing.md),
                           ),
                         ),
                       ],
@@ -195,20 +221,24 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
                     top: BorderSide(color: colors.outlineVariant),
                   ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                child: Row(
                   children: [
-                    SecondaryButton(
-                      label: 'Share Receipt',
-                      onPressed: () => TransactionReceiptShare.shareReceipt(
-                        context: context,
-                        transaction: transaction,
+                    Expanded(
+                      child: _ReceiptActionButton(
+                        key: _shareButtonKey,
+                        label: 'Share Receipt',
+                        isOutlined: true,
+                        isEnabled: !_isSharing,
+                        isLoading: _isSharing,
+                        onPressed: _handleShareReceipt,
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.sm),
-                    PrimaryButton(
-                      label: 'Done',
-                      onPressed: widget.onClose,
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: _ReceiptActionButton(
+                        label: 'Done',
+                        onPressed: widget.onClose,
+                      ),
                     ),
                   ],
                 ),
@@ -221,106 +251,67 @@ class _TransactionReceiptScreenState extends State<TransactionReceiptScreen>
   }
 }
 
-class _SuccessSection extends StatelessWidget {
-  const _SuccessSection({
-    required this.transaction,
-    required this.accentColor,
-    required this.iconScaleAnimation,
-    required this.iconFadeAnimation,
+class _ReceiptActionButton extends StatelessWidget {
+  const _ReceiptActionButton({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.isOutlined = false,
+    this.isEnabled = true,
+    this.isLoading = false,
   });
 
-  final Transaction transaction;
-  final Color accentColor;
-  final Animation<double> iconScaleAnimation;
-  final Animation<double> iconFadeAnimation;
+  final String label;
+  final VoidCallback? onPressed;
+  final bool isOutlined;
+  final bool isEnabled;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
-    final typography = context.typography;
-    final colors = context.appColors;
-
-    return Column(
-      children: [
-        FadeTransition(
-          opacity: iconFadeAnimation,
-          child: ScaleTransition(
-            scale: iconScaleAnimation,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_rounded,
-                color: AppColors.success,
-                size: 44,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Text(
-          TransactionReceiptFormatters.titleForCategory(transaction.category),
-          style: typography.title,
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          TransactionReceiptFormatters.heroAmount(transaction),
-          style: typography.display.copyWith(
-            color: accentColor,
-            fontSize: 36,
-            fontWeight: FontWeight.w700,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          TransactionReceiptFormatters.descriptionForCategory(
-            transaction.category,
-          ),
-          style: typography.body.copyWith(color: colors.subtitle),
-          textAlign: TextAlign.center,
-        ),
-      ],
+    final canPress = isEnabled && !isLoading;
+    final theme = Theme.of(context);
+    final primary = theme.colorScheme.primary;
+    final onPrimary = theme.colorScheme.onPrimary;
+    final labelStyle = theme.textTheme.bodyLarge?.copyWith(
+      fontWeight: FontWeight.w600,
     );
-  }
-}
 
-class _ReceiptDetailRow extends StatelessWidget {
-  const _ReceiptDetailRow({required this.row});
+    final labelWidget = FittedBox(
+      fit: BoxFit.scaleDown,
+      child: Text(
+        label,
+        maxLines: 1,
+        style: labelStyle?.copyWith(
+          color: isOutlined ? primary : onPrimary,
+        ),
+      ),
+    );
 
-  final TransactionReceiptDetailRow row;
-
-  @override
-  Widget build(BuildContext context) {
-    final typography = context.typography;
-    final valueStyle = typography.body.copyWith(fontWeight: FontWeight.w500);
-
-    final valueWidget = row.isSelectable
-        ? Tooltip(
-            message: row.value,
-            child: Text(
-              row.value,
-              style: valueStyle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+    final child = isLoading
+        ? Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              VeegilLoadingIndicator.small(
+                color: isOutlined ? primary : onPrimary,
+              ),
+              const SizedBox(width: 8),
+              Flexible(child: labelWidget),
+            ],
           )
-        : Text(
-            row.value,
-            style: valueStyle,
-          );
+        : labelWidget;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(row.label, style: typography.caption),
-        const SizedBox(height: AppSpacing.xs),
-        valueWidget,
-      ],
+    return SizedBox(
+      height: AppConstants.buttonHeight,
+      child: isOutlined
+          ? OutlinedButton(
+              onPressed: canPress ? onPressed : null,
+              child: child,
+            )
+          : FilledButton(
+              onPressed: canPress ? onPressed : null,
+              child: child,
+            ),
     );
   }
 }

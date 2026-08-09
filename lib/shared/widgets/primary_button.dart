@@ -39,24 +39,38 @@ class SecondaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isEnabled = true,
+    this.isLoading = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool isEnabled;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
+    final canPress = isEnabled && !isLoading;
+    final primary = Theme.of(context).colorScheme.primary;
+
     return Semantics(
       button: true,
-      enabled: isEnabled,
+      enabled: canPress,
       label: label,
       child: SizedBox(
         width: double.infinity,
         height: AppConstants.buttonHeight,
         child: OutlinedButton(
-          onPressed: isEnabled ? onPressed : null,
-          child: Text(label),
+          onPressed: canPress ? onPressed : null,
+          child: isLoading
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    VeegilLoadingIndicator.small(color: primary),
+                    const SizedBox(width: 12),
+                    Text(label),
+                  ],
+                )
+              : Text(label),
         ),
       ),
     );

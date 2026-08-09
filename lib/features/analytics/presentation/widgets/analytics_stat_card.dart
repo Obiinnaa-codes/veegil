@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/account_spacing.dart';
 import '../../../../core/theme/dashboard_spacing.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../shared/widgets/app_surface_card.dart';
-import '../../../profile/presentation/widgets/monthly_overview_item.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/utils/transaction_colors.dart';
+import '../../../transactions/presentation/widgets/transaction_type_icon.dart';
 
 class AnalyticsStatCard extends StatelessWidget {
   const AnalyticsStatCard({
@@ -24,7 +24,7 @@ class AnalyticsStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final typography = context.typography;
-    final color = colorForCategory(context, category);
+    final color = TransactionColors.forCategory(context, category);
     final label = _labelForCategory(category);
     final transactionLabel =
         transactionCount == 1 ? 'Transaction' : 'Transactions';
@@ -35,18 +35,9 @@ class AnalyticsStatCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: AccountSpacing.iconCircleSize,
-            height: AccountSpacing.iconCircleSize,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.12),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              iconForCategory(category),
-              color: color,
-              size: AccountSpacing.iconSize,
-            ),
+          TransactionTypeIcon(
+            category: category,
+            color: color,
           ),
           const SizedBox(height: AppSpacing.md),
           Text(label, style: typography.caption),

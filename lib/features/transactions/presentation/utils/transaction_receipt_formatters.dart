@@ -150,16 +150,6 @@ abstract final class TransactionReceiptFormatters {
       );
     }
 
-    final balance = transaction.balance;
-    if (balance != null) {
-      rows.add(
-        TransactionReceiptDetailRow(
-          label: 'Balance After Transaction',
-          value: CurrencyFormatter.format(balance),
-        ),
-      );
-    }
-
     final note = userNote(transaction);
     if (note != null) {
       rows.add(TransactionReceiptDetailRow(label: 'Note', value: note));

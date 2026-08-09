@@ -3,9 +3,7 @@
 import '../../../../core/theme/app_color_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
-import '../../../../core/theme/account_spacing.dart';
-import '../../../transactions/domain/entities/transaction_category.dart';
-import '../../../transactions/presentation/utils/transaction_colors.dart';
+import '../../../transactions/presentation/widgets/transaction_type_icon.dart';
 
 class MonthlyOverviewItem extends StatelessWidget {
   const MonthlyOverviewItem({
@@ -30,18 +28,10 @@ class MonthlyOverviewItem extends StatelessWidget {
 
     return Column(
       children: [
-        Container(
-          width: AccountSpacing.iconCircleSize,
-          height: AccountSpacing.iconCircleSize,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: color,
-            size: AccountSpacing.iconSize,
-          ),
+        TransactionTypeIcon.custom(
+          icon: icon,
+          color: color,
+          semanticLabel: label,
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(
@@ -73,23 +63,6 @@ class MonthlyOverviewItem extends StatelessWidget {
       ],
     );
   }
-}
-
-IconData iconForCategory(TransactionCategory category) {
-  switch (category) {
-    case TransactionCategory.deposit:
-      return Icons.arrow_downward_rounded;
-    case TransactionCategory.withdraw:
-      return Icons.arrow_upward_rounded;
-    case TransactionCategory.transfer:
-      return Icons.swap_horiz_rounded;
-    case TransactionCategory.unknown:
-      return Icons.receipt_long_outlined;
-  }
-}
-
-Color colorForCategory(BuildContext context, TransactionCategory category) {
-  return TransactionColors.forCategory(context, category);
 }
 
 String transactionCountLabel(int count) {

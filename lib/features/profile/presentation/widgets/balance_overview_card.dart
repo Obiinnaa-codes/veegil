@@ -10,6 +10,7 @@ import '../../../../shared/widgets/app_surface_card.dart';
 import '../../../analytics/presentation/controllers/analytics_data.dart';
 import '../../../dashboard/presentation/widgets/dashboard_shimmer.dart';
 import '../../../transactions/domain/entities/transaction_category.dart';
+import '../../../transactions/presentation/utils/transaction_colors.dart';
 import 'monthly_overview_item.dart';
 
 class BalanceOverviewCard extends StatefulWidget {
@@ -126,8 +127,8 @@ class _MonthlyOverviewRow extends StatelessWidget {
         Expanded(
           child: MonthlyOverviewItem(
             label: 'Deposits',
-            icon: iconForCategory(TransactionCategory.deposit),
-            color: colorForCategory(context, TransactionCategory.deposit),
+            icon: TransactionColors.iconForCategory(TransactionCategory.deposit),
+            color: TransactionColors.forCategory(context, TransactionCategory.deposit),
             primaryValue: data != null
                 ? CurrencyFormatter.format(data.totalDeposits)
                 : '—',
@@ -139,8 +140,8 @@ class _MonthlyOverviewRow extends StatelessWidget {
         Expanded(
           child: MonthlyOverviewItem(
             label: 'Withdrawals',
-            icon: iconForCategory(TransactionCategory.withdraw),
-            color: colorForCategory(context, TransactionCategory.withdraw),
+            icon: TransactionColors.iconForCategory(TransactionCategory.withdraw),
+            color: TransactionColors.forCategory(context, TransactionCategory.withdraw),
             primaryValue: data != null
                 ? CurrencyFormatter.format(data.totalWithdrawals)
                 : '—',
@@ -152,8 +153,8 @@ class _MonthlyOverviewRow extends StatelessWidget {
         Expanded(
           child: MonthlyOverviewItem(
             label: 'Transfers',
-            icon: iconForCategory(TransactionCategory.transfer),
-            color: colorForCategory(context, TransactionCategory.transfer),
+            icon: TransactionColors.iconForCategory(TransactionCategory.transfer),
+            color: TransactionColors.forCategory(context, TransactionCategory.transfer),
             primaryValue: data != null ? '${data.transferCount}' : '—',
             subtitle: data != null
                 ? transactionCountLabel(data.transferCount)
